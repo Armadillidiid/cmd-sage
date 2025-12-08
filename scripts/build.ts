@@ -15,8 +15,8 @@ const isWatch = process.argv.includes("--watch");
 const args = [
   isWatch ? "--watch" : null,
   !isWatch ? "--minify" : null,
-  `--define.__VERSION__='"${pkg.version}"'`,
-  `--define.__NAME__='"${pkg.name}"'`,
+  `--define.__VERSION__="${pkg.version}"`,
+  `--define.__NAME__="${pkg.name}"`,
 ].filter(Boolean) as string[];
 
 // Run pkgroll

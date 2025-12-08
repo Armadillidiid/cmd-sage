@@ -20,6 +20,7 @@
   "scripts": {
     "build": "tsup",
     "build:watch": "tsup --watch",
+    "prepare": "effect-language-service patch",
     "clean": "rimraf dist/*",
     "typecheck": "tsc -b tsconfig.json",
     "test": "vitest run",

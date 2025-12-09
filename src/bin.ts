@@ -1,11 +1,14 @@
 #!/usr/bin/env node
 
-import * as NodeContext from "@effect/platform-node/NodeContext";
-import * as NodeRuntime from "@effect/platform-node/NodeRuntime";
+import { NodeContext, NodeRuntime, NodeTerminal } from "@effect/platform-node";
 import { Effect, Layer } from "effect";
 import { CliService } from "./cli.js";
 
-const layers = Layer.mergeAll(CliService.Default, NodeContext.layer);
+const layers = Layer.mergeAll(
+	CliService.Default,
+	NodeContext.layer,
+	NodeTerminal.layer,
+);
 
 Effect.gen(function* () {
 	const cli = yield* CliService;

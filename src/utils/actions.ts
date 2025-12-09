@@ -4,6 +4,7 @@ import type { ModelMessage } from "ai";
 import { AiService } from "@/services/ai.js";
 import type { SuggestAction } from "@/types.js";
 import { spawn } from "node:child_process";
+import { reviseCommand } from "@/utils/revise.js";
 
 /**
  * Execute a shell command
@@ -96,33 +97,8 @@ export const handleAction = (
 				yield* runCommand(command);
 				return { shouldContinue: false };
 
-			case "revise": {
-				const revision = yield* Prompt.text({
-					message: "How would you like to revise the command?",
-					validate: (input: string) => {
-						if (!input || input.trim().length === 0) {
-							return Effect.fail("Revision prompt cannot be empty");
-						}
-						return Effect.succeed(input);
-					},
-				});
-
-			const ai = yield* AiService;
-			const newMessages: ModelMessage[] = [
-				...messages,
-				{ role: "user", content: revision },
-			];
-			const revisedCommand = yield* ai.suggest(target, newMessages);
-			yield* Console.log(`\n${revisedCommand}\n`);
-
-			return {
-				shouldContinue: true,
-				messages: [
-					...newMessages,
-					{ role: "assistant", content: revisedCommand },
-				] satisfies ModelMessage[],
-			};
-		}
+			case "revise":
+				return yield* reviseCommand(command, messages, target);
 
 			case "explain": {
 				const ai = yield* AiService;

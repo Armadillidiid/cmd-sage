@@ -1,4 +1,4 @@
-import { Effect, Option } from "effect";
+import { Effect, Option, Schema } from "effect";
 import { FileSystem, Path } from "@effect/platform";
 import type { PlatformError } from "@effect/platform/Error";
 import { ModelsFetchError, FileSystemError } from "@/lib/errors.js";
@@ -89,7 +89,18 @@ export const fetchAndCacheModels = (force = false) =>
         }),
     });
 
-    const data = response as ModelsDevResponse;
+    // Decode and validate the response using the schema
+    const data = yield* Schema.decodeUnknown(modelsDevResponseSchema)(
+      response,
+    ).pipe(
+      Effect.mapError(
+        (error) =>
+          new ModelsFetchError({
+            message: "Failed to parse models API response",
+            cause: error,
+          }),
+      ),
+    );
 
     // Ensure state directory exists
     const stateDir = yield* expandHome(STATE_DIRECTORY);
@@ -113,16 +124,13 @@ export const fetchAndCacheModels = (force = false) =>
  */
 export const fetchProviderModels = (providerId: string) =>
   Effect.gen(function* () {
-    // Ensure we have cached data (will fetch if needed)
     const data = yield* fetchAndCacheModels();
 
-    // The data is a record with provider IDs as keys
     const provider = data[providerId];
 
     if (!provider) {
       return [];
     }
 
-    // Convert the models Record to an array
     return Object.values(provider.models);
   });

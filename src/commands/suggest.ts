@@ -46,40 +46,43 @@ const suggestCommand = Command.make(
 				onSome: (p) => Effect.succeed(p),
 			});
 
-			const ai = yield* AiService;
-			let currentCommand = yield* ai.suggest(target, userPrompt);
-			yield* Console.log(`\n${currentCommand}\n`);
+		const ai = yield* AiService;
+		const initialCommand = yield* ai.suggest(target, userPrompt);
+		yield* Console.log(`\n${initialCommand}\n`);
 
-			// Get default action from config
-			const configService = yield* ConfigService;
-			const config = yield* configService.config();
+		// Get default action from config
+		const configService = yield* ConfigService;
+		const config = yield* configService.config();
+      const defaultAction = config?.defaultSuggestAction;
 
-			const defaultAction = config?.defaultSuggestAction;
 
-			// Interactive loop
-			let shouldContinue = true;
-			while (shouldContinue) {
-				const action: SuggestAction = defaultAction
-					? defaultAction
-					: yield* Prompt.select({
-							message: "What would you like to do?",
-							choices: actionChoices,
-						});
+		yield* Effect.iterate(
+			{ command: initialCommand, shouldContinue: true },
+			{
+				while: (state) => state.shouldContinue,
+				body: (state) =>
+					Effect.gen(function* () {
+						const action: SuggestAction = defaultAction
+							? defaultAction
+							: yield* Prompt.select({
+									message: "What would you like to do?",
+									choices: actionChoices,
+								});
 
-				const [continueLoop, newCommand] = yield* handleAction(
-					action,
-					currentCommand,
-					target,
-					userPrompt,
-				);
+						const [continueLoop, newCommand] = yield* handleAction(
+							action,
+							state.command,
+							target,
+							userPrompt,
+						);
 
-				shouldContinue = continueLoop;
-
-				// If we revised, update the current command for next iteration
-				if (newCommand) {
-					currentCommand = newCommand;
-				}
-			}
+							return {
+								command: newCommand ?? state.command,
+								shouldContinue: continueLoop,
+							};
+						}),
+				},
+			);
 		}).pipe(Effect.provide(programLayer)),
 );
 

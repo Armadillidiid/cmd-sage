@@ -1,10 +1,10 @@
-import { Config } from "./schema.js";
+import type { Config } from "./schema.js";
 
 declare const __VERSION__: string;
 declare const __NAME__: string;
 
 const VERSION: string =
-  typeof __VERSION__ !== "undefined" ? __VERSION__ : "0.0.0-dev";
+	typeof __VERSION__ !== "undefined" ? __VERSION__ : "0.0.0-dev";
 const NAME: string = typeof __NAME__ !== "undefined" ? __NAME__ : "unknown";
 
 const CONFIG_DIRECTORY = `~/.config/${NAME}`;
@@ -14,16 +14,16 @@ const STATE_DIRECTORY = `~/.local/state/${NAME}`;
 const CREDENTIALS_FILENAME = "credentials.json";
 
 const DEFAULT_CONFIG: Config = {
-  model: "gpt-4o",
-  provider: "github-models",
+	model: "gpt-4o",
+	provider: "github-models",
 };
 
 export {
-  NAME,
-  VERSION,
-  CONFIG_DIRECTORY,
-  CONFIG_FILENAME,
-  STATE_DIRECTORY,
-  CREDENTIALS_FILENAME,
-  DEFAULT_CONFIG,
+	NAME,
+	VERSION,
+	CONFIG_DIRECTORY,
+	CONFIG_FILENAME,
+	STATE_DIRECTORY,
+	CREDENTIALS_FILENAME,
+	DEFAULT_CONFIG,
 };

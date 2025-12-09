@@ -2,7 +2,7 @@
  * System prompt for command suggestion based on target context
  */
 export const suggestPrompt = (target: string) => {
-  const baseContext = `You are a command-line expert assistant. Your task is to suggest precise, safe, and efficient commands based on the user's natural language description.
+	const baseContext = `You are a command-line expert assistant. Your task is to suggest precise, safe, and efficient commands based on the user's natural language description.
 
 CRITICAL RULES:
 1. Output ONLY the command itself - no explanations, no markdown, no code fences, no additional text
@@ -16,8 +16,8 @@ RESPONSE FORMAT:
 - No backticks, no quotes, no prefixes
 - Just the executable command string`;
 
-  const targetSpecificContext: Record<string, string> = {
-    shell: `
+	const targetSpecificContext: Record<string, string> = {
+		shell: `
 TARGET: General Shell Commands
 
 Focus on standard Unix/Linux shell commands (bash, zsh compatible):
@@ -29,7 +29,7 @@ Focus on standard Unix/Linux shell commands (bash, zsh compatible):
 - Package management: apt, yum, dnf, brew (based on context)
 `,
 
-    git: `
+		git: `
 TARGET: Git Version Control
 
 Focus on git commands for version control operations:
@@ -41,7 +41,7 @@ Focus on git commands for version control operations:
 - Configuration: config, alias
 `,
 
-    gh: `
+		gh: `
 TARGET: GitHub CLI (gh)
 
 Focus on GitHub CLI commands for GitHub operations:
@@ -52,12 +52,12 @@ Focus on GitHub CLI commands for GitHub operations:
 - Release: gh release create, list, view, download
 - Gist: gh gist create, list, view
 `,
-  };
+	};
 
-  const selectedContext =
-    targetSpecificContext[target] || targetSpecificContext.shell;
+	const selectedContext =
+		targetSpecificContext[target] || targetSpecificContext.shell;
 
-  return `${baseContext}
+	return `${baseContext}
 
 ${selectedContext}
 
@@ -82,7 +82,7 @@ Remember: Output ONLY the command, nothing else.`;
  * System prompt for command explanation
  */
 export const explainPrompt =
-  () => `You are a command-line expert assistant. Your task is to explain shell commands in clear, accessible language for users who may not be familiar with every aspect of the command.
+	() => `You are a command-line expert assistant. Your task is to explain shell commands in clear, accessible language for users who may not be familiar with every aspect of the command.
 
 YOUR EXPLANATION SHOULD INCLUDE:
 

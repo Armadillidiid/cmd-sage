@@ -1,7 +1,7 @@
-import { describe, expect, it } from "@effect/vitest"
+import { describe, expect, it } from "@effect/vitest";
 
 describe("Dummy", () => {
-  it("should pass", () => {
-    expect(true).toBe(true)
-  })
-})
+	it("should pass", () => {
+		expect(true).toBe(true);
+	});
+});

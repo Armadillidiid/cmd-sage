@@ -65,11 +65,12 @@ export const providerInfoSchema = Schema.Struct({
   env: Schema.Array(Schema.String),
   doc: Schema.String,
   api: Schema.optional(Schema.String),
-  models: Schema.Array(modelInfoSchema),
+  models: Schema.Record({ key: Schema.String, value: modelInfoSchema }),
 });
 export type ProviderInfo = typeof providerInfoSchema.Type;
 
-export const modelsDevResponseSchema = Schema.Struct({
-  providers: Schema.Array(providerInfoSchema),
+export const modelsDevResponseSchema = Schema.Record({
+  key: Schema.String,
+  value: providerInfoSchema,
 });
 export type ModelsDevResponse = typeof modelsDevResponseSchema.Type;

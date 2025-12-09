@@ -5,6 +5,7 @@ import { CredentialsService } from "@/services/credentials.js";
 import { ConfigService } from "@/services/config.js";
 import { fetchProviderModels } from "@/utils/models.js";
 import { Credentials } from "@/schema.js";
+import { NAME } from "@/constants.js";
 
 const PROVIDER_CHOICES = [
   { title: "OpenAI", value: "openai" as const },
@@ -106,7 +107,7 @@ const configureCommand = Command.make("configure", {}, () =>
 
     yield* Console.log("\n✅ Configuration saved successfully!\n");
     yield* Console.log(
-      "You can now use cmd-sage with your configured provider.\n",
+      `You can now use ${NAME} with your configured provider.\n`,
     );
   }).pipe(
     Effect.provide(

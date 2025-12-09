@@ -14,7 +14,7 @@ import { credentialsSchema, Credentials } from "@/schema.js";
 const DEFAULT_CREDENTIALS: Credentials = {};
 
 /**
- * Load credentials from ~/.local/state/cmd-sage/credentials.json
+ * Load credentials from ~/.local/state/${NAME}/credentials.json
  * Creates the file with empty credentials if it doesn't exist
  * Sets file permissions to 0600 (read/write for owner only) for security
  */
@@ -45,7 +45,7 @@ const loadCredentials = Effect.gen(function* () {
 });
 
 /**
- * Save credentials to ~/.local/state/cmd-sage/credentials.json
+ * Save credentials to ~/.local/state/${NAME}/credentials.json
  * Maintains strict file permissions (0600)
  */
 const saveCredentials = (credentials: Credentials) =>

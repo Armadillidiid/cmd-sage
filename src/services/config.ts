@@ -35,7 +35,7 @@ const onStartLoadConfig = Effect.gen(function* () {
 });
 
 /**
- * Save config to ~/.config/cmd-sage/cmd-sage.json
+ * Save config to ~/.config/${NAME}/${NAME}.json
  */
 const saveConfig = (config: Config) =>
   Effect.gen(function* () {

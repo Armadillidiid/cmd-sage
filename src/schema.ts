@@ -28,7 +28,7 @@ export const modelCostSchema = Schema.Struct({
 
 export const modelLimitSchema = Schema.Struct({
   context: Schema.Number,
-  input: Schema.Number,
+  input: Schema.optional(Schema.Number),
   output: Schema.Number,
 });
 

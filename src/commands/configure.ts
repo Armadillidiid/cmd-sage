@@ -26,16 +26,21 @@ const configureCommand = Command.make("configure", {}, () =>
 			value: id,
 		}));
 
-		// Reorder choices to put current provider first if it exists
+		// Reorder choices to put current provider first and mark it
 		if (currentConfig?.provider) {
 			const currentProviderIndex = providerChoices.findIndex(
 				(p) => p.value === currentConfig.provider,
 			);
-			if (currentProviderIndex > 0) {
+			if (currentProviderIndex >= 0) {
 				const currentProvider = providerChoices[currentProviderIndex];
 				if (currentProvider) {
+					const markedProvider = {
+						...currentProvider,
+						title: `${currentProvider.title} (Current)`,
+					};
+
 					providerChoices = [
-						currentProvider,
+						markedProvider,
 						...providerChoices.slice(0, currentProviderIndex),
 						...providerChoices.slice(currentProviderIndex + 1),
 					];
@@ -60,7 +65,7 @@ const configureCommand = Command.make("configure", {}, () =>
 		}
 
 		const apiKey = yield* Prompt.password({
-			message: `Enter your ${providerChoices.find((p) => p.value === provider)?.title} API key:`,
+			message: `Enter your ${providerChoices.find((p) => p.value === provider)?.title.replace(" (Current)", "")} API key:`,
 			validate: (input) => {
 				if (!input || input.trim().length === 0) {
 					return Effect.fail("API key cannot be empty");
@@ -95,16 +100,21 @@ const configureCommand = Command.make("configure", {}, () =>
 				value: model.id,
 			}));
 
-			// Reorder choices to put current model first if it exists and provider matches
+			// Reorder choices to put current model first and mark it if provider matches
 			if (currentConfig?.model && currentConfig.provider === provider) {
 				const currentModelIndex = modelChoices.findIndex(
 					(m) => m.value === currentConfig.model,
 				);
-				if (currentModelIndex > 0) {
+				if (currentModelIndex >= 0) {
 					const currentModel = modelChoices[currentModelIndex];
 					if (currentModel) {
+						const markedModel = {
+							...currentModel,
+							title: `${currentModel.title} (Current)`,
+						};
+
 						modelChoices = [
-							currentModel,
+							markedModel,
 							...modelChoices.slice(0, currentModelIndex),
 							...modelChoices.slice(currentModelIndex + 1),
 						];

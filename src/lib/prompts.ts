@@ -113,10 +113,10 @@ User Command: "rm -rf /tmp/cache"
 
 Recursively deletes the /tmp/cache directory and all its contents without prompting for confirmation.
 
-- \`rm\`: The remove command, used to delete files and directories
-  - \`-r\` (recursive): Deletes directories and all their contents, including subdirectories
-  - \`-f\` (force): Skips confirmation prompts and ignores non-existent files
-    - \`/tmp/cache\`: The target directory path to be deleted
+• \`rm\`: The remove command, used to delete files and directories
+  • \`-r\` (recursive): Deletes directories and all their contents, including subdirectories
+  • \`-f\` (force): Skips confirmation prompts and ignores non-existent files
+    • \`/tmp/cache\`: The target directory path to be deleted
 
 ---
 
@@ -126,9 +126,9 @@ User Command: "git log --oneline --graph --all --decorate"
 Displays a compact, visual representation of the entire Git commit history across all branches with decorative references.
 
 ## Breakdown
-- \`git log\`: Shows the commit history
-  - \`--oneline\`: Condenses each commit to a single line (short hash + message)
-  - \`--graph\`: Draws ASCII art branches showing the commit graph structure
-  - \`--all\`: Includes commits from all branches, not just the current one
-  - \`--decorate\`: Shows branch names and tags next to relevant commits
+• \`git log\`: Shows the commit history
+  • \`--oneline\`: Condenses each commit to a single line (short hash + message)
+  • \`--graph\`: Draws ASCII art branches showing the commit graph structure
+  • \`--all\`: Includes commits from all branches, not just the current one
+  • \`--decorate\`: Shows branch names and tags next to relevant commits
 `;

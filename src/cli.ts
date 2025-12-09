@@ -1,6 +1,7 @@
 import { Command } from "@effect/cli";
 import { Effect } from "effect";
 import { configureCommand } from "./commands/configure.js";
+import { explainCommand } from "./commands/explain.js";
 import { suggestCommand } from "./commands/suggest.js";
 import { NAME, VERSION } from "./constants.js";
 
@@ -10,7 +11,9 @@ const mainCommand = Command.make(NAME, {}, () =>
 			`${NAME} v${VERSION}. run ${NAME} --help for more information.`,
 		);
 	}),
-).pipe(Command.withSubcommands([suggestCommand, configureCommand]));
+).pipe(
+	Command.withSubcommands([suggestCommand, explainCommand, configureCommand]),
+);
 
 const cliService = Effect.gen(function* () {
 	return {

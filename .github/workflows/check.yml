@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install dependencies
         uses: ./.github/actions/setup
-      - run: pnpm check
+      - run: pnpm typecheck
   test:
     name: Test
     runs-on: ubuntu-latest

@@ -5,14 +5,9 @@ import { NAME } from "@/constants.js";
 import type { Credentials } from "@/schema.js";
 import { ConfigService } from "@/services/config.js";
 import { CredentialsService } from "@/services/credentials.js";
-import { fetchProviderModels } from "@/utils/models.js";
-
-const PROVIDER_CHOICES = [
-	{ title: "OpenAI", value: "openai" as const },
-	{ title: "Anthropic (Claude)", value: "anthropic" as const },
-	{ title: "Google (Gemini)", value: "google" as const },
-	{ title: "GitHub Models", value: "github-models" as const },
-] as const;
+import { fetchProviderModels, fetchAndCacheModels } from "@/utils/models.js";
+import { SUPPORTED_PROVIDER_IDS } from "@/constants.js";
+import { type ProviderId } from "@/utils/models.js";
 
 const configureCommand = Command.make("configure", {}, () =>
 	Effect.gen(function* () {
@@ -20,15 +15,22 @@ const configureCommand = Command.make("configure", {}, () =>
 			"This wizard will help you set up your AI provider credentials and preferences.\n",
 		);
 
+		// Fetch models data to get provider names
+		const modelsData = yield* fetchAndCacheModels()
+		const providerChoices = SUPPORTED_PROVIDER_IDS.map((id) => ({
+			title: modelsData[id]?.name || id,
+			value: id,
+		}));
+
 		// Step 1: Select provider
 		const provider = yield* Prompt.select({
 			message: "Select your AI provider:",
-			choices: PROVIDER_CHOICES,
+			choices: providerChoices,
 		});
 
 		// Step 2: Get API key
 		const apiKey = yield* Prompt.password({
-			message: `Enter your ${PROVIDER_CHOICES.find((p) => p.value === provider)?.title} API key:`,
+			message: `Enter your ${providerChoices.find((p) => p.value === provider)?.title} API key:`,
 			validate: (input) => {
 				if (!input || input.trim().length === 0) {
 					return Effect.fail("API key cannot be empty");

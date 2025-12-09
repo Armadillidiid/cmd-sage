@@ -28,4 +28,12 @@ export {
 	DEFAULT_CONFIG,
 };
 export const MODELS_CACHE_FILENAME = "models.json";
-export const MODELS_CACHE_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
+export const MODELS_CACHE_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours/**
+
+/** List of supported AI providers */
+export const SUPPORTED_PROVIDER_IDS = [
+	"openai",
+	"anthropic",
+	"google",
+	"github-models",
+] as const;

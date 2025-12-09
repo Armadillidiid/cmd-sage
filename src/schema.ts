@@ -1,4 +1,5 @@
 import { Schema } from "effect";
+import { SUPPORTED_PROVIDER_IDS } from "./constants.js";
 
 export const configSchema = Schema.Struct({
 	model: Schema.String,
@@ -6,12 +7,13 @@ export const configSchema = Schema.Struct({
 });
 export type Config = typeof configSchema.Type;
 
+const credentialsFields = Object.fromEntries(
+	SUPPORTED_PROVIDER_IDS.map((id) => [id, Schema.optional(Schema.String)]),
+);
+
 export const credentialsSchema = Schema.Struct({
 	token: Schema.optional(Schema.String),
-	openai: Schema.optional(Schema.String),
-	anthropic: Schema.optional(Schema.String),
-	google: Schema.optional(Schema.String),
-	"github-models": Schema.optional(Schema.String),
+	...credentialsFields,
 });
 export type Credentials = typeof credentialsSchema.Type;
 

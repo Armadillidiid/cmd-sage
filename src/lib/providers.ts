@@ -4,13 +4,9 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { Effect } from "effect";
 import { MissingApiKeyError, UnknownProviderError } from "./errors.js";
+import type { ProviderId } from "@/providers.js";
 
-export type Provider =
-	| "openai"
-	| "anthropic"
-	| "google"
-	| "github-models"
-	| (string & {});
+export type Provider = ProviderId | (string & {});
 
 export const getProvider = (providerName: Provider, apiKey?: string) =>
 	Effect.gen(function* () {

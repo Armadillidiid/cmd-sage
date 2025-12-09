@@ -1,5 +1,5 @@
 import { Command, Prompt } from "@effect/cli";
-import { Effect, Console, Layer } from "effect";
+import { Effect, Console, Layer, Redacted } from "effect";
 import { NodeFileSystem, NodePath } from "@effect/platform-node";
 import { CredentialsService } from "@/services/credentials.js";
 import { ConfigService } from "@/services/config.js";
@@ -84,7 +84,7 @@ const configureCommand = Command.make("configure", {}, () =>
 
     const updatedCredentials: Credentials = {
       ...currentCredentials,
-      [provider]: apiKey,
+      [provider]: Redacted.value(apiKey),
     };
 
     yield* credentialsService.saveCredentials(updatedCredentials);

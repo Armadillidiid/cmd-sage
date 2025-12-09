@@ -23,7 +23,7 @@ const suggestCommand = Command.make(
     Effect.gen(function* () {
       const ai = yield* AiService;
       const res = yield* ai.suggest(target, prompt);
-      yield* Console.log(`AI Suggestion for ${target}:\n${res}`);
+      yield* Console.log(res);
     }).pipe(Effect.provide(programLayer)),
 );
 

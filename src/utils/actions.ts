@@ -3,6 +3,7 @@ import { AiService } from "@/services/ai.js";
 import type { SuggestAction } from "@/types.js";
 import { spawn } from "node:child_process";
 import { ActionError } from "@/lib/errors.js";
+import clipboardy from "clipboardy";
 
 /**
  * Execute a shell command
@@ -57,47 +58,19 @@ export const runCommand = (command: string) =>
  */
 export const copyCommand = (command: string) =>
 	Effect.gen(function* () {
-		// Try to use system clipboard
-		const clipboardCommands = [
-			{ cmd: "pbcopy", platform: "darwin" }, // macOS
-			{ cmd: "xclip -selection clipboard", platform: "linux" }, // Linux with xclip
-			{ cmd: "xsel --clipboard --input", platform: "linux" }, // Linux with xsel
-			{ cmd: "wl-copy", platform: "linux" }, // Wayland
-		];
+		yield* Effect.tryPromise({
+			try: async () => {
+				await clipboardy.write(command);
+			},
+			catch: (err) => {
+				return new ActionError({
+					message: "Failed to copy to clipboard",
+					cause: err,
+				});
+			},
+		});
 
-		let copied = false;
-
-		for (const { cmd } of clipboardCommands) {
-			const result = yield* Effect.tryPromise({
-				try: () =>
-					new Promise<boolean>((resolve) => {
-						const proc = spawn(cmd, { shell: true });
-						proc.stdin.write(command);
-						proc.stdin.end();
-						proc.on("close", (code: number | null) => resolve(code === 0));
-						proc.on("error", () => resolve(false));
-					}),
-				catch: (err) => {
-					return new ActionError({
-						message: "Failed to copy to clipboard",
-						cause: err,
-					});
-				},
-			});
-
-			if (result) {
-				copied = true;
-				break;
-			}
-		}
-
-		if (copied) {
-			yield* Console.log(`\n📋 Copied to clipboard: ${command}\n`);
-		} else {
-			yield* Console.log(
-				`\n!  Could not copy to clipboard. Command:\n\n${command}\n`,
-			);
-		}
+		yield* Console.log(`\n📋 Copied to clipboard: ${command}\n`);
 	});
 
 export const handleAction = (

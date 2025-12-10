@@ -82,8 +82,8 @@ export const handleAction = (
 			case "explain": {
 				const ai = yield* AiService;
 				const explanation = yield* ai.explain(command);
-				yield* Console.log(`\n${explanation}\n`);
-				return { shouldContinue: true };
+				yield* Console.log(`\n${explanation}`);
+				return { shouldContinue: false };
 			}
 
 			case "copy":
@@ -91,7 +91,7 @@ export const handleAction = (
 				return { shouldContinue: false };
 
 			case "cancel":
-				yield* Console.log("\nCancelled.\n");
+				yield* Console.log("\nCancelled.");
 				return { shouldContinue: false };
 		}
 	});

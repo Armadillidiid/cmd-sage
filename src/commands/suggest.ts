@@ -1,15 +1,25 @@
 import { Args, Command, Options, Prompt } from "@effect/cli";
+import { NodeFileSystem, NodePath } from "@effect/platform-node";
 import type { ModelMessage } from "ai";
 import { Console, Effect, Layer, Option } from "effect";
 import { AiService } from "@/services/ai.js";
 import { ConfigService } from "@/services/config.js";
+import { CredentialsService } from "@/services/credentials.js";
+import { GitHubOAuthService } from "@/services/github-oauth.js";
 import type { SuggestAction } from "@/types.js";
 import { handleAction } from "@/utils/actions.js";
 import { SUGGEST_ACTION_CHOICES } from "@/constants.js";
 import { displayStream } from "@/utils/stream.js";
 import { highlightShell } from "@/utils/highlight.js";
 
-const programLayer = Layer.mergeAll(AiService.Default, ConfigService.Default);
+const programLayer = Layer.mergeAll(
+	GitHubOAuthService.Default,
+	CredentialsService.Default,
+	ConfigService.Default,
+	AiService.Default,
+	NodeFileSystem.layer,
+	NodePath.layer,
+);
 
 const targetChoices = ["shell", "git"] as const;
 
@@ -130,13 +140,13 @@ const getSuggestAndLog = (
 	Effect.gen(function* () {
 		// Print newline before streaming starts
 		yield* Console.log("");
-		
+
 		// Get the stream from AI service
 		const stream = yield* ai.suggest(target, messages);
-		
+
 		// Display the stream with highlighting
 		const command = yield* displayStream(stream, highlightShell);
-		
+
 		// Print newline after streaming ends
 		yield* Console.log("");
 		return command;

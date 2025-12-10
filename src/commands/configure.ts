@@ -10,6 +10,14 @@ import type { Credentials, CredentialValue } from "@/types.js";
 import { markCurrentChoice, stripCurrentMarker } from "@/utils/config.js";
 import { fetchAndCacheModels, fetchProviderModels } from "@/utils/models.js";
 
+const layers = Layer.mergeAll(
+	GitHubOAuthService.Default,
+	CredentialsService.Default,
+	ConfigService.Default,
+	NodeFileSystem.layer,
+	NodePath.layer,
+);
+
 const configureCommand = Command.make("configure", {}, () =>
 	Effect.gen(function* () {
 		yield* Console.log(
@@ -219,17 +227,7 @@ const configureCommand = Command.make("configure", {}, () =>
 		}
 
 		yield* Console.log("\nConfiguration saved!\n");
-	}).pipe(
-		Effect.provide(
-			Layer.mergeAll(
-				GitHubOAuthService.Default,
-				CredentialsService.Default,
-				ConfigService.Default,
-				NodeFileSystem.layer,
-				NodePath.layer,
-			),
-		),
-	),
+	}).pipe(Effect.provide(layers)),
 );
 
 export { configureCommand };

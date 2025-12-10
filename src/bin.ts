@@ -1,16 +1,31 @@
 #!/usr/bin/env node
 
-import { NodeContext, NodeRuntime, NodeTerminal } from "@effect/platform-node";
+import {
+	NodeContext,
+	NodeFileSystem,
+	NodePath,
+	NodeRuntime,
+	NodeTerminal,
+} from "@effect/platform-node";
 import { Cause, Console, Effect, Exit, Layer } from "effect";
 import { CliService } from "./cli.js";
+import { ConfigService } from "./services/config.js";
+import { CredentialsService } from "./services/credentials.js";
+import { GitHubOAuthService } from "./services/github-oauth.js";
 
 const layers = Layer.mergeAll(
-	CliService.Default,
 	NodeContext.layer,
 	NodeTerminal.layer,
+	NodeFileSystem.layer,
+	NodePath.layer,
+	// Services
+	CliService.Default,
+	GitHubOAuthService.Default,
+	CredentialsService.Default,
+	ConfigService.Default,
 );
 
-Effect.gen(function* () {
+const x = Effect.gen(function* () {
 	const cli = yield* CliService;
 	yield* cli.run(process.argv);
 }).pipe(
@@ -35,17 +50,18 @@ Effect.gen(function* () {
 		AiServiceError: (error) =>
 			Console.error(`\nAI service error: ${error.message}\n`),
 		ActionError: (error) => Console.error(`\nAction error: ${error.message}\n`),
-		StreamError: (error) =>
-			Console.error(`\nStream error: ${error.message}\n`),
+		StreamError: (error) => Console.error(`\nStream error: ${error.message}\n`),
+		GitHubOAuthError: (error) =>
+			Console.error(`\nGitHub OAuth error: ${error.message}\n`),
 	}),
 	Effect.provide(layers),
-	NodeRuntime.runMain({
-		teardown: (exit) => {
-			// Force exit: copy-paste library spawns child processes (pbcopy/xclip/clip),
-			// which keeps Node's event loop alive even after the command completes successfully
-			const code =
-				Exit.isFailure(exit) && !Cause.isInterruptedOnly(exit.cause) ? 1 : 0;
-			process.exit(code);
-		},
-	}),
+	// NodeRuntime.runMain({
+	// 	teardown: (exit) => {
+	// 		// Force exit: copy-paste library spawns child processes (pbcopy/xclip/clip),
+	// 		// which keeps Node's event loop alive even after the command completes successfully
+	// 		const code =
+	// 			Exit.isFailure(exit) && !Cause.isInterruptedOnly(exit.cause) ? 1 : 0;
+	// 		process.exit(code);
+	// 	},
+	// }),
 );

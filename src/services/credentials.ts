@@ -1,5 +1,5 @@
 import { Path } from "@effect/platform";
-import { Effect, Layer } from "effect";
+import { Effect } from "effect";
 import { CREDENTIALS_FILENAME, STATE_DIRECTORY } from "@/constants.js";
 import { CredentialsError } from "@/lib/errors.js";
 import { credentialsSchema } from "@/schema.js";
@@ -12,8 +12,6 @@ import {
 	writeJsonFile,
 } from "@/utils/files.js";
 import { GitHubOAuthService } from "./github-oauth.js";
-
-const layers = Layer.mergeAll(GitHubOAuthService.Default);
 
 /**
  * Load credentials from ~/.local/state/${NAME}/credentials.json
@@ -158,11 +156,12 @@ const credentialsService = Effect.succeed({
 	) => setCredential(provider, credential),
 	saveCredentials: (newCredentials: CredentialsRecord) =>
 		saveCredentials(newCredentials),
-}).pipe(Effect.provide(layers));
+})
 
 export class CredentialsService extends Effect.Service<CredentialsService>()(
 	"CredentialsService",
 	{
 		effect: credentialsService,
+		dependencies: [GitHubOAuthService.Default],
 	},
 ) {}

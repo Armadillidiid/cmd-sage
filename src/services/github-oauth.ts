@@ -92,7 +92,15 @@ const initiateDeviceFlow = Effect.gen(function* () {
 			}),
 	});
 
-	return yield* Schema.decodeUnknown(DeviceCodeResponseSchema)(response);
+	return yield* Schema.decodeUnknown(DeviceCodeResponseSchema)(response).pipe(
+		Effect.mapError(
+			(error) =>
+				new GitHubOAuthError({
+					message: "Schema validation failed for device code response",
+					cause: error,
+				}),
+		),
+	);
 });
 
 /**
@@ -252,12 +260,7 @@ const getCopilotToken = (
  * Refresh the Copilot token using the GitHub OAuth refresh token
  * Should be called when the access token expires
  */
-const refreshCopilotToken = (
-	refreshToken: string,
-): Effect.Effect<
-	{ token: string; tokenExpiry: number },
-	GitHubOAuthError
-> =>
+const refreshCopilotToken = (refreshToken: string) =>
 	Effect.gen(function* () {
 		const copilotTokenData = yield* getCopilotToken(refreshToken);
 
@@ -315,9 +318,11 @@ const authenticateWithGitHub = Effect.gen(function* () {
 	};
 });
 
-const githubOAuthService = Effect.succeed({
-	authenticate: authenticateWithGitHub,
-	refreshToken: refreshCopilotToken,
+const githubOAuthService = Effect.gen(function* () {
+	return {
+		authenticate: authenticateWithGitHub,
+		refreshToken: refreshCopilotToken,
+	};
 });
 
 export class GitHubOAuthService extends Effect.Service<GitHubOAuthService>()(

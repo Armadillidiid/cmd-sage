@@ -1,11 +1,21 @@
 import { Args, Command, Prompt } from "@effect/cli";
+import { NodeFileSystem, NodePath } from "@effect/platform-node";
 import { Console, Effect, Layer, Option } from "effect";
 import { AiService } from "@/services/ai.js";
 import { ConfigService } from "@/services/config.js";
+import { CredentialsService } from "@/services/credentials.js";
+import { GitHubOAuthService } from "@/services/github-oauth.js";
 import { displayStream } from "@/utils/stream.js";
 import { highlightMarkdown } from "@/utils/highlight.js";
 
-const programLayer = Layer.mergeAll(AiService.Default, ConfigService.Default);
+const programLayer = Layer.mergeAll(
+	GitHubOAuthService.Default,
+	CredentialsService.Default,
+	ConfigService.Default,
+	AiService.Default,
+	NodeFileSystem.layer,
+	NodePath.layer,
+);
 
 const command = Args.optional(Args.text({ name: "command" }));
 

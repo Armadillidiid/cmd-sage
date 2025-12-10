@@ -60,7 +60,7 @@ const configureCommand = Command.make("configure", {}, () =>
 		// Step 2: Get API key
 		if (existingApiKey) {
 			yield* Console.log(
-				`\n💡 Existing API key found. Press Enter to keep it, or enter a new one.\n`,
+				`\nExisting API key found. Press Enter to keep it, or enter a new one.\n`,
 			);
 		}
 
@@ -135,7 +135,7 @@ const configureCommand = Command.make("configure", {}, () =>
 		});
 
 		if (!confirm) {
-			yield* Console.log("\n❌ Configuration cancelled.\n");
+			yield* Console.log("\nConfiguration cancelled.\n");
 			return;
 		}
 
@@ -156,7 +156,7 @@ const configureCommand = Command.make("configure", {}, () =>
 
 			yield* configService.saveConfig(updatedConfig);
 			yield* Console.log(
-				`\ni  Default model set to: ${selectedModel} (provider: ${provider})`,
+				`\n Default model set to: ${selectedModel} (provider: ${provider})`,
 			);
 		}
 

@@ -9,56 +9,52 @@ import clipboard from "copy-paste";
  * Execute a shell command
  */
 export const runCommand = (command: string) =>
-	Effect.gen(function* () {
-		yield* Console.log(`\n🚀 Running: ${command}\n`);
+	Effect.tryPromise({
+		try: () =>
+			new Promise<void>((resolve, reject) => {
+				const shell = spawn(command, {
+					stdio: "inherit",
+					shell: true,
+				});
 
-		yield* Effect.tryPromise({
-			try: () =>
-				new Promise<void>((resolve, reject) => {
-					const shell = spawn(command, {
-						stdio: "inherit",
-						shell: true,
-					});
-
-					shell.on("close", (code: number | null) => {
-						if (code === 0) {
-							resolve();
-						} else {
-							reject(
-								new ActionError({
-									message: `Command failed with exit code ${code}`,
-								}),
-							);
-						}
-					});
-
-					shell.on("error", (err) =>
+				shell.on("close", (code: number | null) => {
+					if (code === 0) {
+						resolve();
+					} else {
 						reject(
 							new ActionError({
-								message: "Failed to execute command",
-								cause: err,
+								message: `Command failed with exit code ${code}`,
 							}),
-						),
-					);
-				}),
-			catch: (err) => {
-				if (err instanceof ActionError) {
-					return err;
-				}
-				return new ActionError({
-					message: "Failed to execute command",
-					cause: err,
+						);
+					}
 				});
-			},
-		});
+
+				shell.on("error", (err) =>
+					reject(
+						new ActionError({
+							message: "Failed to execute command",
+							cause: err,
+						}),
+					),
+				);
+			}),
+		catch: (err) => {
+			if (err instanceof ActionError) {
+				return err;
+			}
+			return new ActionError({
+				message: "Failed to execute command",
+				cause: err,
+			});
+		},
 	});
 
 /**
  * Copy command to system clipboard
  */
 export const copyCommand = (command: string) =>
-	Effect.gen(function* () {
-		yield* Effect.try({
+	Effect.asVoid(
+		Effect.try({
 			try: () => clipboard.copy(command),
 			catch: (err) => {
 				return new ActionError({
@@ -66,8 +62,8 @@ export const copyCommand = (command: string) =>
 					cause: err,
 				});
 			},
-		});
-	});
+		}),
+	);
 
 export const handleAction = (
 	action: Exclude<SuggestAction, "revise">,
@@ -91,7 +87,7 @@ export const handleAction = (
 				return { shouldContinue: false };
 
 			case "cancel":
-				yield* Console.log("\n❌ Cancelled.\n");
+				yield* Console.log("\nCancelled.\n");
 				return { shouldContinue: false };
 		}
 	});

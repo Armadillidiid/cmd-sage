@@ -1,4 +1,3 @@
-import { Terminal } from "@effect/platform";
 import { Effect } from "effect";
 import { StreamError } from "@/lib/errors.js";
 
@@ -10,23 +9,20 @@ export const displayStream = <R>(
 	highlighter: (text: string) => Effect.Effect<string, never, R>,
 ) =>
 	Effect.gen(function* () {
-		const terminal = yield* Terminal.Terminal;
+		// Save cursor position
+		yield* Effect.sync(() => {
+			globalThis.process.stdout.write("\x1b[s");
+		});
 
-		// Consume the stream and display in real-time
 		const streamData = yield* Effect.tryPromise({
 			try: async () => {
 				let accumulated = "";
-				let linesWritten = 0;
-
 				for await (const chunk of stream.textStream) {
 					accumulated += chunk;
-					// Count newlines to track how many lines we've written
-					linesWritten += (chunk.match(/\n/g) || []).length;
 					// Display chunk immediately for real-time feedback
 					globalThis.process.stdout.write(chunk);
 				}
-
-				return { text: accumulated, lines: linesWritten };
+				return accumulated;
 			},
 			catch: (error) =>
 				new StreamError({
@@ -35,20 +31,14 @@ export const displayStream = <R>(
 				}),
 		});
 
-		// Apply syntax highlighting
-		const highlighted = yield* highlighter(streamData.text);
+		const highlighted = yield* highlighter(streamData);
 
-		// Clear all lines that were written during streaming
-		// Move cursor up and clear each line
-		let clearCommands = "";
-		for (let i = 0; i < streamData.lines; i++) {
-			clearCommands += "\x1b[1A\x1b[K"; // Move up one line and clear it
-		}
-		// Clear the current line too
-		clearCommands += "\r\x1b[K";
+		// Restore cursor to the saved position
+		globalThis.process.stdout.write("\x1b[u");
+		// Clear from cursor to end of screen
+		globalThis.process.stdout.write("\x1b[J");
 
-		// Display clear commands + highlighted version
-		yield* terminal.display(`${clearCommands}${highlighted}`);
+		globalThis.process.stdout.write(highlighted);
 
-		return streamData.text;
+		return streamData;
 	});

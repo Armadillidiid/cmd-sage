@@ -1,20 +1,14 @@
 import { Schema } from "effect";
 import { BundledTheme, bundledThemesInfo } from "shiki";
-import { SUPPORTED_PROVIDER_IDS } from "./constants.js";
+import { SUGGEST_ACTIONS, SUPPORTED_PROVIDER_IDS } from "./constants.js";
 import type { Provider } from "./lib/providers.js";
 
-export const suggestActionSchema = Schema.Literal(
-	"run",
-	"revise",
-	"explain",
-	"copy",
-	"cancel",
-);
+export const suggestActionSchema = Schema.Literal(...Object.values(SUGGEST_ACTIONS));
 
 export const configSchema = Schema.Struct({
 	model: Schema.String,
 	provider: Schema.String,
-	defaultSuggestAction: Schema.optional(suggestActionSchema),
+	default_suggest_action: Schema.optional(suggestActionSchema),
 	theme: Schema.optional(
 		Schema.Literal(
 			...(bundledThemesInfo.map((theme) => theme.id) as BundledTheme[]),

@@ -2,14 +2,15 @@ import { Command, Prompt } from "@effect/cli";
 import { NodeFileSystem, NodePath } from "@effect/platform-node";
 import { Console, Effect, Layer, Redacted } from "effect";
 import { bundledThemesInfo, type BundledTheme } from "shiki";
-import { NAME, SUPPORTED_PROVIDER_IDS } from "@/constants.js";
+import {
+	NAME,
+	SUGGEST_ACTION_CHOICES,
+	SUPPORTED_PROVIDER_IDS,
+} from "@/constants.js";
 import { ConfigService } from "@/services/config.js";
 import { CredentialsService } from "@/services/credentials.js";
 import type { Credentials } from "@/types.js";
-import {
-	markCurrentChoice,
-	stripCurrentMarker,
-} from "@/utils/config.js";
+import { markCurrentChoice, stripCurrentMarker } from "@/utils/config.js";
 import { fetchAndCacheModels, fetchProviderModels } from "@/utils/models.js";
 
 const configureCommand = Command.make("configure", {}, () =>
@@ -113,7 +114,21 @@ const configureCommand = Command.make("configure", {}, () =>
 			choices: themeChoices,
 		});
 
-		// Step 6: Confirm before saving
+		// Step 6: Select default suggest action
+		const actionChoices = markCurrentChoice(
+			SUGGEST_ACTION_CHOICES,
+			currentConfig?.default_suggest_action,
+		);
+
+		const selectedAction = yield* Prompt.select({
+			message: "Select default action for suggest command (or keep prompting):",
+			choices: [
+				{ title: "Always prompt me (Recommended)", value: undefined },
+				...actionChoices,
+			],
+		});
+
+		// Step 7: Confirm before saving
 		const confirm = yield* Prompt.confirm({
 			message: "\nSave these settings?",
 			initial: true,
@@ -124,7 +139,7 @@ const configureCommand = Command.make("configure", {}, () =>
 			return;
 		}
 
-		// Step 7: Save credentials
+		// Step 8: Save credentials
 		const updatedCredentials: Credentials = {
 			...currentCredentials,
 			[provider]: Redacted.value(apiKey),
@@ -132,12 +147,13 @@ const configureCommand = Command.make("configure", {}, () =>
 
 		yield* credentialsService.saveCredentials(updatedCredentials);
 
-		// Step 8: Save config
+		// Step 9: Save config
 		if (selectedModel) {
 			const updatedConfig = {
 				model: selectedModel,
 				provider: provider,
 				theme: selectedTheme,
+				default_suggest_action: selectedAction,
 			};
 
 			yield* configService.saveConfig(updatedConfig);
@@ -149,11 +165,17 @@ const configureCommand = Command.make("configure", {}, () =>
 			const updatedConfig = {
 				...currentConfig,
 				theme: selectedTheme,
+				default_suggest_action: selectedAction,
 			};
 			yield* configService.saveConfig(updatedConfig);
 		}
 
 		yield* Console.log(`✨ Theme set to: ${selectedTheme}`);
+		if (selectedAction) {
+			yield* Console.log(`🎯 Default action set to: ${selectedAction}`);
+		} else {
+			yield* Console.log(`🎯 Will prompt for action each time`);
+		}
 
 		yield* Console.log("\n✅ Configuration saved successfully!\n");
 		yield* Console.log(

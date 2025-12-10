@@ -37,3 +37,19 @@ export const SUPPORTED_PROVIDER_IDS = [
 	"google",
 	"github-models",
 ] as const;
+
+export const SUGGEST_ACTIONS = {
+	RUN: "run",
+	REVISE: "revise",
+	EXPLAIN: "explain",
+	COPY: "copy",
+	CANCEL: "cancel",
+} as const;
+
+export const SUGGEST_ACTION_CHOICES = [
+	{ title: "Run", value: SUGGEST_ACTIONS.RUN },
+	{ title: "Revise", value: SUGGEST_ACTIONS.REVISE },
+	{ title: "Explain", value: SUGGEST_ACTIONS.EXPLAIN },
+	{ title: "Copy", value: SUGGEST_ACTIONS.COPY },
+	{ title: "Cancel", value: SUGGEST_ACTIONS.CANCEL },
+];

@@ -6,6 +6,7 @@ import { ConfigService } from "@/services/config.js";
 import type { SuggestAction } from "@/types.js";
 import { handleAction } from "@/utils/actions.js";
 import { highlightShell } from "@/utils/highlight.js";
+import { SUGGEST_ACTION_CHOICES } from "@/constants.js";
 
 const programLayer = Layer.mergeAll(AiService.Default, ConfigService.Default);
 
@@ -17,14 +18,6 @@ const target = Options.choice("target", targetChoices).pipe(
 );
 
 const prompt = Args.optional(Args.text({ name: "prompt" }));
-
-const actionChoices = [
-	{ title: "Run", value: "run" as const },
-	{ title: "Revise", value: "revise" as const },
-	{ title: "Explain", value: "explain" as const },
-	{ title: "Copy", value: "copy" as const },
-	{ title: "Cancel", value: "cancel" as const },
-];
 
 const suggestCommand = Command.make(
 	"suggest",
@@ -56,7 +49,7 @@ const suggestCommand = Command.make(
 			// Get default action from config
 			const configService = yield* ConfigService;
 			const config = yield* configService.config();
-			const defaultAction = config?.defaultSuggestAction;
+			const defaultAction = config?.default_suggest_action;
 
 			const initialState: {
 				messages: ModelMessage[];
@@ -77,7 +70,7 @@ const suggestCommand = Command.make(
 							? defaultAction
 							: yield* Prompt.select({
 									message: "What would you like to do?",
-									choices: actionChoices,
+									choices: SUGGEST_ACTION_CHOICES,
 								});
 
 						// Handle revision inline as it's part of the conversation loop

@@ -59,9 +59,11 @@ const ErrorResponseSchema = Schema.Struct({
  */
 const CopilotTokenResponseSchema = Schema.Struct({
 	token: Schema.String,
-	expires_at: Schema.optional(Schema.Number),
+	expires_at: Schema.Number,
 	refresh_in: Schema.optional(Schema.Number),
 });
+
+type CopilotTokenResponse = typeof CopilotTokenResponseSchema.Type;
 
 /**
  * Initiate the GitHub Device Code Flow
@@ -205,7 +207,7 @@ const pollForAccessToken = (
  */
 const getCopilotToken = (
 	githubAccessToken: string,
-): Effect.Effect<string, GitHubOAuthError> =>
+): Effect.Effect<CopilotTokenResponse, GitHubOAuthError> =>
 	Effect.gen(function* () {
 		yield* Console.log("Retrieving Copilot token...\n");
 
@@ -247,12 +249,31 @@ const getCopilotToken = (
 			),
 		);
 
-		return copilotTokenResult.token;
+		return copilotTokenResult;
+	});
+
+/**
+ * Refresh the Copilot token using the GitHub OAuth refresh token
+ * Should be called when the access token expires
+ */
+const refreshCopilotToken = (
+	refreshToken: string,
+): Effect.Effect<
+	{ token: string; tokenExpiry: number },
+	GitHubOAuthError
+> =>
+	Effect.gen(function* () {
+		const copilotTokenData = yield* getCopilotToken(refreshToken);
+
+		return {
+			token: copilotTokenData.token,
+			tokenExpiry: copilotTokenData.expires_at * 1000, // Convert to milliseconds
+		};
 	});
 
 /**
  * Authenticate with GitHub using the Device Code Flow
- * Returns a Copilot token that can be used to authenticate with GitHub Copilot
+ * Returns OAuth refresh token and Copilot access token with expiry
  */
 const authenticateWithGitHub = Effect.gen(function* () {
 	yield* Console.log(
@@ -271,8 +292,8 @@ const authenticateWithGitHub = Effect.gen(function* () {
 	yield* Console.log(`2. Enter this code: ${deviceCodeResponse.user_code}\n`);
 	yield* Console.log("Waiting for authorization...\n");
 
-	// Step 3: Poll for GitHub OAuth access token
-	const githubAccessToken = yield* pollForAccessToken(
+	// Step 3: Poll for GitHub OAuth access token (this becomes our refresh token)
+	const githubRefreshToken = yield* pollForAccessToken(
 		deviceCodeResponse.device_code,
 		deviceCodeResponse.interval,
 	).pipe(
@@ -287,15 +308,20 @@ const authenticateWithGitHub = Effect.gen(function* () {
 	yield* Console.log("✅ Authorization successful!\n");
 
 	// Step 4: Exchange GitHub OAuth token for Copilot token
-	const copilotToken = yield* getCopilotToken(githubAccessToken);
+	const copilotTokenData = yield* getCopilotToken(githubRefreshToken);
 
 	yield* Console.log("✅ Copilot token retrieved!\n");
 
-	return copilotToken;
+	return {
+		refreshToken: githubRefreshToken,
+		token: copilotTokenData.token,
+		tokenExpiry: copilotTokenData.expires_at * 1000, // Convert to milliseconds
+	};
 });
 
 const githubOAuthService = Effect.succeed({
 	authenticate: authenticateWithGitHub,
+	refreshToken: refreshCopilotToken,
 });
 
 export class GitHubOAuthService extends Effect.Service<GitHubOAuthService>()(
@@ -305,4 +331,4 @@ export class GitHubOAuthService extends Effect.Service<GitHubOAuthService>()(
 	},
 ) {}
 
-export { authenticateWithGitHub };
+export { authenticateWithGitHub, refreshCopilotToken };

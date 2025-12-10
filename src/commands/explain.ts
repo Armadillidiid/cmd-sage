@@ -1,9 +1,10 @@
 import { Args, Command, Prompt } from "@effect/cli";
 import { Console, Effect, Layer, Option } from "effect";
 import { AiService } from "@/services/ai.js";
+import { ConfigService } from "@/services/config.js";
 import { highlightMarkdown } from "@/utils/highlight.js";
 
-const programLayer = Layer.mergeAll(AiService.Default);
+const programLayer = Layer.mergeAll(AiService.Default, ConfigService.Default);
 
 const command = Args.optional(Args.text({ name: "command" }));
 

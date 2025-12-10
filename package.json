@@ -63,6 +63,7 @@
 		"@ai-sdk/openai-compatible": "^1.0.28",
 		"@shikijs/cli": "^3.19.0",
 		"ai": "^5.0.108",
-		"copy-paste": "^2.2.0"
+		"copy-paste": "^2.2.0",
+		"shiki": "3.19.0"
 	}
 }

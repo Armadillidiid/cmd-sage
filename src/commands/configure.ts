@@ -1,11 +1,14 @@
 import { Command, Prompt } from "@effect/cli";
 import { NodeFileSystem, NodePath } from "@effect/platform-node";
 import { Console, Effect, Layer, Redacted } from "effect";
+import { bundledThemesInfo, type BundledTheme } from "shiki";
 import { NAME, SUPPORTED_PROVIDER_IDS } from "@/constants.js";
 import { ConfigService } from "@/services/config.js";
 import { CredentialsService } from "@/services/credentials.js";
 import type { Credentials } from "@/types.js";
 import { fetchAndCacheModels, fetchProviderModels } from "@/utils/models.js";
+
+// Generate theme choices from shiki's bundled themes
 
 const configureCommand = Command.make("configure", {}, () =>
 	Effect.gen(function* () {
@@ -127,7 +130,40 @@ const configureCommand = Command.make("configure", {}, () =>
 			});
 		}
 
-		// Step 5: Confirm before saving
+		// Step 5: Select theme
+		let themeChoices = bundledThemesInfo.map((theme) => ({
+			title: theme.displayName,
+			value: theme.id as BundledTheme,
+		}));
+
+		// Mark current theme if it exists
+		if (currentConfig?.theme) {
+			const currentThemeIndex = themeChoices.findIndex(
+				(t) => t.value === currentConfig.theme,
+			);
+			if (currentThemeIndex >= 0) {
+				const currentTheme = themeChoices[currentThemeIndex];
+				if (currentTheme) {
+					const markedTheme = {
+						...currentTheme,
+						title: `${currentTheme.title} (Current)`,
+					};
+
+					themeChoices = [
+						markedTheme,
+						...themeChoices.slice(0, currentThemeIndex),
+						...themeChoices.slice(currentThemeIndex + 1),
+					];
+				}
+			}
+		}
+
+		const selectedTheme = yield* Prompt.select({
+			message: "Select your syntax highlighting theme:",
+			choices: themeChoices,
+		});
+
+		// Step 6: Confirm before saving
 		const confirm = yield* Prompt.confirm({
 			message: "\nSave these settings?",
 			initial: true,
@@ -138,7 +174,7 @@ const configureCommand = Command.make("configure", {}, () =>
 			return;
 		}
 
-		// Step 6: Save credentials
+		// Step 7: Save credentials
 		const updatedCredentials: Credentials = {
 			...currentCredentials,
 			[provider]: Redacted.value(apiKey),
@@ -146,18 +182,28 @@ const configureCommand = Command.make("configure", {}, () =>
 
 		yield* credentialsService.saveCredentials(updatedCredentials);
 
-		// Step 7: Save config (if model was selected)
+		// Step 8: Save config
 		if (selectedModel) {
 			const updatedConfig = {
 				model: selectedModel,
 				provider: provider,
+				theme: selectedTheme,
 			};
 
 			yield* configService.saveConfig(updatedConfig);
 			yield* Console.log(
 				`\n Default model set to: ${selectedModel} (provider: ${provider})`,
 			);
+		} else {
+			// Save theme even if model wasn't selected
+			const updatedConfig = {
+				...currentConfig,
+				theme: selectedTheme,
+			};
+			yield* configService.saveConfig(updatedConfig);
 		}
+
+		yield* Console.log(`✨ Theme set to: ${selectedTheme}`);
 
 		yield* Console.log("\n✅ Configuration saved successfully!\n");
 		yield* Console.log(

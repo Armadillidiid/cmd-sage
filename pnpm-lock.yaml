@@ -29,6 +29,9 @@ importers:
       copy-paste:
         specifier: ^2.2.0
         version: 2.2.0
+      shiki:
+        specifier: 3.19.0
+        version: 3.19.0
     devDependencies:
       '@biomejs/biome':
         specifier: 2.3.8

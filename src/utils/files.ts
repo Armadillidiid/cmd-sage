@@ -141,59 +141,23 @@ export const ensureFilePermissions = (
 	});
 
 /**
- * Load a JSON configuration file with default value and schema validation
- * Creates the file with default value if it doesn't exist
+ * Read and validate a JSON config file
  */
-export const loadJsonConfig = <A, I, R>(
+export const readJsonConfig = <A, I, R>(
 	filePath: string,
-	defaultValue: A,
 	schema: Schema.Schema<A, I, R>,
-	options?: {
-		ensurePermissions?: number;
-		logMessages?: {
-			notFound?: string;
-			created?: string;
-		};
-	},
-): Effect.Effect<
-	A,
-	PlatformError | FileSystemError,
-	FileSystem.FileSystem | Path.Path | R
-> =>
+) =>
 	Effect.gen(function* () {
-		const path = yield* Path.Path;
 		const expandedPath = yield* expandHome(filePath);
 		const exists = yield* fileExists(expandedPath);
 
 		if (!exists) {
-			if (options?.logMessages?.notFound) {
-				yield* Effect.log(options.logMessages.notFound);
-			}
-
-			// Ensure directory exists
-			const dir = path.dirname(expandedPath);
-			yield* ensureDirectory(dir);
-
-			// Write default config
-			yield* writeJsonFile(expandedPath, defaultValue);
-
-			// Set permissions if specified
-			if (options?.ensurePermissions !== undefined) {
-				yield* setFilePermissions(expandedPath, options.ensurePermissions);
-			}
-
-			if (options?.logMessages?.created) {
-				yield* Effect.log(options.logMessages.created);
-			}
-
-			return defaultValue;
-		} else {
-			// Check and fix permissions if specified
-			if (options?.ensurePermissions !== undefined) {
-				yield* ensureFilePermissions(expandedPath, options.ensurePermissions);
-			}
-
-			// Read and parse config
-			return yield* readJsonFile(expandedPath, schema);
+			return undefined;
 		}
+
+		// Ensure strict permissions (0o600)
+		yield* ensureFilePermissions(expandedPath, 0o600);
+
+		// Read and parse config
+		return yield* readJsonFile(expandedPath, schema);
 	});

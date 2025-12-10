@@ -11,7 +11,7 @@ import type { Config } from "@/types.js";
 import {
 	ensureDirectory,
 	expandHome,
-	loadJsonConfig,
+	readJsonConfig,
 	writeJsonFile,
 } from "@/utils/files.js";
 
@@ -19,12 +19,7 @@ const onStartLoadConfig = Effect.gen(function* () {
 	const path = yield* Path.Path;
 	const configPath = path.join(CONFIG_DIRECTORY, CONFIG_FILENAME);
 
-	return yield* loadJsonConfig(configPath, DEFAULT_CONFIG, configSchema, {
-		logMessages: {
-			notFound: `Config file not found at ${configPath}, creating default config...`,
-			created: `Default config created at ${configPath}`,
-		},
-	}).pipe(
+	const config = yield* readJsonConfig(configPath, configSchema).pipe(
 		Effect.mapError(
 			(error) =>
 				new ConfigError({
@@ -33,6 +28,8 @@ const onStartLoadConfig = Effect.gen(function* () {
 				}),
 		),
 	);
+
+	return config ?? DEFAULT_CONFIG;
 });
 
 /**

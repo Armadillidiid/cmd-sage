@@ -7,7 +7,7 @@ import type { CredentialValue, CredentialsRecord } from "@/types.js";
 import {
 	ensureDirectory,
 	expandHome,
-	loadJsonConfig,
+	readJsonConfig,
 	setFilePermissions,
 	writeJsonFile,
 } from "@/utils/files.js";
@@ -23,22 +23,7 @@ const loadCredentials = Effect.gen(function* () {
 	const credentialsPathRaw = path.join(STATE_DIRECTORY, CREDENTIALS_FILENAME);
 	const credentialsPath = yield* expandHome(credentialsPathRaw);
 
-	return yield* loadJsonConfig(credentialsPath, undefined, credentialsSchema, {
-		ensurePermissions: 0o600,
-	}).pipe(
-		Effect.catchTag("FileSystemError", (error) => {
-			if (error.operation === "readFile") {
-				return Effect.succeed(undefined);
-			}
-			return Effect.fail(
-				new CredentialsError({
-					message:
-						"Failed to load credentials. Please run 'configure' command if you haven't already.",
-					cause: error,
-				}),
-			);
-		}),
-	);
+	return yield* readJsonConfig(credentialsPath, credentialsSchema);
 });
 
 /**

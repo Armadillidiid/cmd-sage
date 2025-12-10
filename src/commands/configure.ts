@@ -16,7 +16,7 @@ import { fetchAndCacheModels, fetchProviderModels } from "@/utils/models.js";
 const configureCommand = Command.make("configure", {}, () =>
 	Effect.gen(function* () {
 		yield* Console.log(
-			"This wizard will help you set up your AI provider credentials and preferences.\n",
+			"This wizard will help you set up your credentials and preferences.\n",
 		);
 
 		// Load existing config and credentials to use as defaults
@@ -121,9 +121,9 @@ const configureCommand = Command.make("configure", {}, () =>
 		);
 
 		const selectedAction = yield* Prompt.select({
-			message: "Select default action for suggest command (or keep prompting):",
+			message: "Select default action for suggest command",
 			choices: [
-				{ title: "Always prompt me (Recommended)", value: undefined },
+				{ title: "Always prompt me", value: undefined },
 				...actionChoices,
 			],
 		});
@@ -157,9 +157,6 @@ const configureCommand = Command.make("configure", {}, () =>
 			};
 
 			yield* configService.saveConfig(updatedConfig);
-			yield* Console.log(
-				`\n Default model set to: ${selectedModel} (provider: ${provider})`,
-			);
 		} else {
 			// Save theme even if model wasn't selected
 			const updatedConfig = {
@@ -170,17 +167,7 @@ const configureCommand = Command.make("configure", {}, () =>
 			yield* configService.saveConfig(updatedConfig);
 		}
 
-		yield* Console.log(`✨ Theme set to: ${selectedTheme}`);
-		if (selectedAction) {
-			yield* Console.log(`🎯 Default action set to: ${selectedAction}`);
-		} else {
-			yield* Console.log(`🎯 Will prompt for action each time`);
-		}
-
-		yield* Console.log("\n✅ Configuration saved successfully!\n");
-		yield* Console.log(
-			`You can now use ${NAME} with your configured provider.\n`,
-		);
+		yield* Console.log("\nConfiguration saved!\n");
 	}).pipe(
 		Effect.provide(
 			Layer.mergeAll(

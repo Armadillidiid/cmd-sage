@@ -1,5 +1,5 @@
 import { Path } from "@effect/platform";
-import { Effect } from "effect";
+import { Effect, Layer } from "effect";
 import { CREDENTIALS_FILENAME, STATE_DIRECTORY } from "@/constants.js";
 import { CredentialsError } from "@/lib/errors.js";
 import { credentialsSchema } from "@/schema.js";
@@ -11,6 +11,9 @@ import {
 	setFilePermissions,
 	writeJsonFile,
 } from "@/utils/files.js";
+import { GitHubOAuthService } from "./github-oauth.js";
+
+const layers = Layer.mergeAll(GitHubOAuthService.Default);
 
 /**
  * Load credentials from ~/.local/state/${NAME}/credentials.json
@@ -120,6 +123,28 @@ const getCredential = (provider: keyof CredentialsRecord) =>
 			);
 		}
 
+		if (
+			credential.type === "oauth" &&
+			credential.expires &&
+			new Date() > new Date(credential.expires) &&
+			credential.refresh
+		) {
+			if (provider === "github-copilot") {
+				const githubOAuthService = yield* GitHubOAuthService;
+				const { token, tokenExpiry } = yield* githubOAuthService.refreshToken(
+					credential.refresh,
+				);
+				const updatedCredential: CredentialValue = {
+					type: "oauth",
+					access: token,
+					refresh: credential.refresh,
+					expires: tokenExpiry,
+				};
+				yield* setCredential(provider, updatedCredential);
+				return updatedCredential;
+			}
+		}
+
 		return credential;
 	});
 
@@ -149,7 +174,7 @@ const credentialsService = Effect.succeed({
 	) => setCredential(provider, credential),
 	saveCredentials: (newCredentials: CredentialsRecord) =>
 		saveCredentials(newCredentials),
-});
+}).pipe(Effect.provide(layers));
 
 export class CredentialsService extends Effect.Service<CredentialsService>()(
 	"CredentialsService",

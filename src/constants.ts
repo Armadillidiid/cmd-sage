@@ -10,7 +10,7 @@ const NAME: string = typeof __NAME__ !== "undefined" ? __NAME__ : "unknown";
 const CONFIG_DIRECTORY = `~/.config/${NAME}`;
 const CONFIG_FILENAME = `${NAME}.json`;
 
-const STATE_DIRECTORY = `~/.local/state/${NAME}`;
+const STATE_DIRECTORY = `~/.local/share/${NAME}`;
 const CREDENTIALS_FILENAME = "credentials.json";
 
 const DEFAULT_CONFIG: Config = {

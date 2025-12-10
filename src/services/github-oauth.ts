@@ -67,7 +67,6 @@ type CopilotTokenResponse = typeof CopilotTokenResponseSchema.Type;
 
 /**
  * Initiate the GitHub Device Code Flow
- * Requests device and user verification codes from GitHub
  */
 const initiateDeviceFlow = Effect.gen(function* () {
 	const response = yield* Effect.tryPromise({
@@ -201,9 +200,6 @@ const pollForAccessToken = (
 
 /**
  * Retrieve the Copilot-specific token using the GitHub OAuth access token
- * This is the final step that exchanges the OAuth token for a Copilot token
- *
- * Based on the official OpenCode Copilot auth plugin implementation
  */
 const getCopilotToken = (
 	githubAccessToken: string,

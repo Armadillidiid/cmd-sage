@@ -1,6 +1,6 @@
-import { detectShell } from "@/utils/shell.js";
-import { Effect } from "effect";
 import * as os from "node:os";
+import { Effect } from "effect";
+import { detectShell } from "@/utils/shell.js";
 
 const gatherContext = Effect.sync(() => {
 	const platform = os.platform();

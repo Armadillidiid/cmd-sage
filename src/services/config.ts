@@ -7,7 +7,7 @@ import {
 } from "@/constants.js";
 import { ConfigError } from "@/lib/errors.js";
 import { configSchema } from "@/schema.js";
-import { type Config } from "@/types.js";
+import type { Config } from "@/types.js";
 import {
 	ensureDirectory,
 	expandHome,

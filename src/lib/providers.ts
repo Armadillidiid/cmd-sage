@@ -3,8 +3,8 @@ import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createOpenAI } from "@ai-sdk/openai";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { Effect } from "effect";
+import type { SUPPORTED_PROVIDER_IDS } from "@/constants.js";
 import { MissingApiKeyError, UnknownProviderError } from "./errors.js";
-import { SUPPORTED_PROVIDER_IDS } from "@/constants.js";
 
 export type ProviderId = (typeof SUPPORTED_PROVIDER_IDS)[number];
 export type Provider = ProviderId | (string & {});

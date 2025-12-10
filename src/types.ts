@@ -1,5 +1,5 @@
-import { SUPPORTED_PROVIDER_IDS } from "./constants.js";
-import {
+import type { SUPPORTED_PROVIDER_IDS } from "./constants.js";
+import type {
 	configSchema,
 	credentialsSchema,
 	modelInfoSchema,

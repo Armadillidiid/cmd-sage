@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import { CREDENTIALS_FILENAME, STATE_DIRECTORY } from "@/constants.js";
 import { CredentialsError } from "@/lib/errors.js";
 import { credentialsSchema } from "@/schema.js";
-import { type Credentials } from "@/types.js";
+import type { Credentials } from "@/types.js";
 import {
 	ensureDirectory,
 	expandHome,

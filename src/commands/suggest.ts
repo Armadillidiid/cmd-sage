@@ -1,6 +1,6 @@
 import { Args, Command, Options, Prompt } from "@effect/cli";
-import { Console, Effect, Layer, Option } from "effect";
 import type { ModelMessage } from "ai";
+import { Console, Effect, Layer, Option } from "effect";
 import { AiService } from "@/services/ai.js";
 import { ConfigService } from "@/services/config.js";
 import type { SuggestAction } from "@/types.js";

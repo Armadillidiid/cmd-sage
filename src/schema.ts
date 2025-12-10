@@ -1,6 +1,6 @@
 import { Schema } from "effect";
 import { SUPPORTED_PROVIDER_IDS } from "./constants.js";
-import { Provider } from "./lib/providers.js";
+import type { Provider } from "./lib/providers.js";
 
 export const suggestActionSchema = Schema.Literal(
 	"run",
@@ -78,4 +78,3 @@ export const modelsDevResponseSchema = Schema.Record({
 	key: Schema.String,
 	value: providerInfoSchema,
 });
-

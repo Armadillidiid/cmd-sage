@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { NodeContext, NodeRuntime, NodeTerminal } from "@effect/platform-node";
-import { Effect, Layer, Console, Cause, Exit } from "effect";
+import { Cause, Console, Effect, Exit, Layer } from "effect";
 import { CliService } from "./cli.js";
 
 const layers = Layer.mergeAll(

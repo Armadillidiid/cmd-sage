@@ -1,9 +1,9 @@
+import { spawn } from "node:child_process";
+import clipboard from "copy-paste";
 import { Console, Effect } from "effect";
+import { ActionError } from "@/lib/errors.js";
 import { AiService } from "@/services/ai.js";
 import type { SuggestAction } from "@/types.js";
-import { spawn } from "node:child_process";
-import { ActionError } from "@/lib/errors.js";
-import clipboard from "copy-paste";
 import { highlightMarkdown } from "@/utils/highlight.js";
 
 /**
@@ -80,13 +80,13 @@ export const handleAction = (
 				yield* runCommand(command);
 				return { shouldContinue: false };
 
-		case "explain": {
-			const ai = yield* AiService;
-			const explanation = yield* ai.explain(command);
-			const highlighted = yield* highlightMarkdown(explanation);
-			yield* Console.log(`\n${highlighted}`);
-			return { shouldContinue: false };
-		}
+			case "explain": {
+				const ai = yield* AiService;
+				const explanation = yield* ai.explain(command);
+				const highlighted = yield* highlightMarkdown(explanation);
+				yield* Console.log(`\n${highlighted}`);
+				return { shouldContinue: false };
+			}
 
 			case "copy":
 				yield* copyCommand(command);

@@ -1,5 +1,5 @@
-import { Effect } from "effect";
 import { codeToANSI } from "@shikijs/cli";
+import { Effect } from "effect";
 
 /**
  * Highlights shell command using shiki

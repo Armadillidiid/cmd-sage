@@ -1,12 +1,11 @@
 import { Command, Prompt } from "@effect/cli";
 import { NodeFileSystem, NodePath } from "@effect/platform-node";
 import { Console, Effect, Layer, Redacted } from "effect";
-import { NAME } from "@/constants.js";
-import type { Credentials } from "@/types.js";
+import { NAME, SUPPORTED_PROVIDER_IDS } from "@/constants.js";
 import { ConfigService } from "@/services/config.js";
 import { CredentialsService } from "@/services/credentials.js";
-import { fetchProviderModels, fetchAndCacheModels } from "@/utils/models.js";
-import { SUPPORTED_PROVIDER_IDS } from "@/constants.js";
+import type { Credentials } from "@/types.js";
+import { fetchAndCacheModels, fetchProviderModels } from "@/utils/models.js";
 
 const configureCommand = Command.make("configure", {}, () =>
 	Effect.gen(function* () {

@@ -30,6 +30,18 @@ export const getProvider = (providerName: Provider, apiKey?: string) =>
 					apiKey: apiKey,
 					baseURL: "https://models.github.ai/inference",
 				});
+			case "github-copilot":
+				return createOpenAICompatible({
+					name: "github-copilot",
+					apiKey: apiKey,
+					headers: {
+						"User-Agent": "GitHubCopilotChat/0.32.4",
+						"Editor-Version": "vscode/1.105.1",
+						"Editor-Plugin-Version": "copilot-chat/0.32.4",
+						"Copilot-Integration-Id": "vscode-chat",
+					},
+					baseURL: "https://api.githubcopilot.com/chat/completions",
+				});
 			default:
 				return yield* Effect.fail(
 					new UnknownProviderError({ provider: providerName }),

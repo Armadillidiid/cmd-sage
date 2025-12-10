@@ -47,3 +47,8 @@ export class StreamError extends TaggedError("StreamError")<{
 	readonly message: string;
 	readonly cause?: unknown;
 }> {}
+
+export class GitHubOAuthError extends TaggedError("GitHubOAuthError")<{
+	readonly message: string;
+	readonly cause?: unknown;
+}> {}

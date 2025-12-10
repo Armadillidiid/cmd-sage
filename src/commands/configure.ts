@@ -8,6 +8,7 @@ import {
 } from "@/constants.js";
 import { ConfigService } from "@/services/config.js";
 import { CredentialsService } from "@/services/credentials.js";
+import { authenticateWithGitHub } from "@/services/github-oauth.js";
 import type { Credentials } from "@/types.js";
 import { markCurrentChoice, stripCurrentMarker } from "@/utils/config.js";
 import { fetchAndCacheModels, fetchProviderModels } from "@/utils/models.js";
@@ -42,27 +43,55 @@ const configureCommand = Command.make("configure", {}, () =>
 		// Get existing API key for this provider if it exists
 		const existingApiKey = currentCredentials[provider];
 
-		// Step 2: Get API key
-		if (existingApiKey) {
+		let apiKey: string;
+
+		// Step 2: Handle authentication based on provider
+		if (provider === "github-copilot") {
+			// Use GitHub Device Flow for Copilot
 			yield* Console.log(
-				`\nExisting API key found. Press Enter to keep it, or enter a new one.\n`,
+				"\n⚠️  GitHub Copilot requires device-based authentication instead of an API key.\n",
 			);
-		}
 
-		const providerTitle = stripCurrentMarker(
-			providerChoices.find((p) => p.value === provider)?.title ?? provider,
-		);
+			// Check if user already has a token
+			if (existingApiKey) {
+				const shouldReauth = yield* Prompt.confirm({
+					message: "You already have an access token. Re-authenticate?",
+					initial: false,
+				});
 
-		const apiKey = yield* Prompt.password({
-			message: `Enter your ${providerTitle} API key:`,
-			validate: (input) => {
-				if (!input || input.trim().length === 0) {
-					return Effect.fail("API key cannot be empty");
+				if (shouldReauth) {
+					apiKey = yield* authenticateWithGitHub;
+				} else {
+					apiKey = existingApiKey;
 				}
-				return Effect.succeed(input);
-			},
-			default: existingApiKey || "",
-		});
+			} else {
+				apiKey = yield* authenticateWithGitHub;
+			}
+		} else {
+			// Standard API key input for other providers
+			if (existingApiKey) {
+				yield* Console.log(
+					`\nExisting API key found. Press Enter to keep it, or enter a new one.\n`,
+				);
+			}
+
+			const providerTitle = stripCurrentMarker(
+				providerChoices.find((p) => p.value === provider)?.title ?? provider,
+			);
+
+			const redactedApiKey = yield* Prompt.password({
+				message: `Enter your ${providerTitle} API key:`,
+				validate: (input) => {
+					if (!input || input.trim().length === 0) {
+						return Effect.fail("API key cannot be empty");
+					}
+					return Effect.succeed(input);
+				},
+				default: existingApiKey || "",
+			});
+
+			apiKey = Redacted.value(redactedApiKey);
+		}
 
 		// Step 3: Fetch available models for the provider
 		yield* Console.log(`\nFetching available models for ${provider}...\n`);
@@ -141,7 +170,7 @@ const configureCommand = Command.make("configure", {}, () =>
 		// Step 8: Save credentials
 		const updatedCredentials: Credentials = {
 			...currentCredentials,
-			[provider]: Redacted.value(apiKey),
+			[provider]: apiKey,
 		};
 
 		yield* credentialsService.saveCredentials(updatedCredentials);

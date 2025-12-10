@@ -36,6 +36,7 @@ export const SUPPORTED_PROVIDER_IDS = [
 	"anthropic",
 	"google",
 	"github-models",
+	"github-copilot",
 ] as const;
 
 export const SUGGEST_ACTIONS = {

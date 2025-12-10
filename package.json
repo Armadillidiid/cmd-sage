@@ -48,6 +48,7 @@
 		"@effect/platform": "^0.93.6",
 		"@effect/platform-node": "^0.103.0",
 		"@effect/vitest": "^0.27.0",
+		"@types/copy-paste": "^2.1.0",
 		"@types/node": "^24.10.1",
 		"effect": "^3.19.9",
 		"pkgroll": "^2.21.4",
@@ -62,6 +63,6 @@
 		"@ai-sdk/openai-compatible": "^1.0.28",
 		"@shikijs/cli": "^3.19.0",
 		"ai": "^5.0.108",
-		"clipboardy": "^5.0.1"
+		"copy-paste": "^2.2.0"
 	}
 }

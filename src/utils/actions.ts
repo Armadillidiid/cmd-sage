@@ -3,7 +3,7 @@ import { AiService } from "@/services/ai.js";
 import type { SuggestAction } from "@/types.js";
 import { spawn } from "node:child_process";
 import { ActionError } from "@/lib/errors.js";
-import clipboardy from "clipboardy";
+import clipboard from "copy-paste";
 
 /**
  * Execute a shell command
@@ -58,10 +58,8 @@ export const runCommand = (command: string) =>
  */
 export const copyCommand = (command: string) =>
 	Effect.gen(function* () {
-		yield* Effect.tryPromise({
-			try: async () => {
-				await clipboardy.write(command);
-			},
+		yield* Effect.try({
+			try: () => clipboard.copy(command),
 			catch: (err) => {
 				return new ActionError({
 					message: "Failed to copy to clipboard",
@@ -69,8 +67,6 @@ export const copyCommand = (command: string) =>
 				});
 			},
 		});
-
-		yield* Console.log(`\n📋 Copied to clipboard: ${command}\n`);
 	});
 
 export const handleAction = (

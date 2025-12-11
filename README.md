@@ -1,32 +1,209 @@
-# Effect CLI Application Template
+# ✨ `cmd-sage`
 
-This template provides a solid foundation for building scalable and maintainable command-line applications with Effect. 
+A drop-in replacement for the recently deprecated `gh-copilot`.
 
-## Running Code
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D23-brightgreen.svg)](https://nodejs.org/)
 
-This template leverages [tsx](https://tsx.is) to allow execution of TypeScript files via NodeJS as if they were written in plain JavaScript.
+## Demo
 
-To execute a file with `tsx`:
+PLACEHOLDER - VIDEO DEMO
 
-```sh
-pnpm tsx ./path/to/the/file.ts
+## Table of Contents
+
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Commands](#commands)
+  - [suggest](#suggest)
+  - [explain](#explain)
+  - [configure](#configure)
+- [Configuration](#configuration)
+- [Development](#development)
+
+## Installation
+
+> **Prerequisite**: **Node.js** >= 23
+
+```bash
+npm install -g cmd-sage
 ```
 
-## Operations
+## Quick Start
 
-**Building**
+1. **Configure your AI provider:**
 
-To build the package:
+```bash
+cmd-sage configure
+```
 
-```sh
+Follow the interactive wizard to set up your preferred AI provider, API key, default model, and preferences.
+
+2. **Get command suggestions:**
+
+```bash
+cmd-sage suggest "find all typescript files modified in the last week"
+```
+
+3. **Explain complex commands:**
+
+```bash
+cmd-sage explain "find . -name '*.ts' -type f -mtime -7"
+```
+
+## Commands
+
+### suggest
+
+Generate command suggestions from natural language descriptions.
+
+**Usage:**
+
+```bash
+cmd-sage suggest [prompt] [options]
+```
+
+**Arguments:**
+
+- `prompt` (optional) - Natural language description of what you want to do. If omitted, you'll be prompted interactively.
+
+**Options:**
+
+- `-t, --target <type>` - Target command type: `shell` (default) or `git`
+
+**Examples:**
+
+```bash
+# Interactive mode
+cmd-sage suggest
+
+# Direct prompt
+cmd-sage suggest "list all processes using port 3000"
+
+# Git-specific commands
+cmd-sage suggest "create a new branch from main" --target git
+
+# Shell commands (explicit)
+cmd-sage suggest "compress all log files older than 30 days" --target shell
+```
+
+**Interactive Actions:**
+
+After receiving a suggestion, you can:
+
+- **Run** - Execute the command immediately
+- **Revise** - Refine the suggestion with additional context
+- **Explain** - Get a detailed breakdown of how the command works
+- **Copy** - Copy the command to your clipboard
+- **Cancel** - Exit without taking action
+
+**Example Session:**
+
+```bash
+$ cmd-sage suggest "find large files over 100MB"
+
+find . -type f -size +100M
+
+? What would you like to do? (Use arrow keys)
+❯ Run
+  Revise
+  Explain
+  Copy
+  Cancel
+```
+
+### explain
+
+Get detailed explanations of shell commands with component breakdowns.
+
+**Usage:**
+
+```bash
+cmd-sage explain [command]
+```
+
+**Arguments:**
+
+- `command` (optional) - The command to explain. If omitted, you'll be prompted to enter one.
+
+**Examples:**
+
+```bash
+# Interactive mode
+cmd-sage explain
+
+# Direct command
+cmd-sage explain "tar -xzf archive.tar.gz -C /destination"
+
+# Complex pipe
+cmd-sage explain "ps aux | grep node | awk '{print \$2}' | xargs kill"
+```
+
+**Example Output:**
+
+```bash
+$ cmd-sage explain "rm -rf /tmp/cache"
+
+## Summary
+
+Recursively deletes the /tmp/cache directory and all its contents without
+prompting for confirmation.
+
+## Breakdown
+
+• `rm`: The remove command, used to delete files and directories
+  • `-r` (recursive): Deletes directories and all their contents
+  • `-f` (force): Skips confirmation prompts
+    • `/tmp/cache`: The target directory path to be deleted
+```
+
+### configure
+
+Set up or update your cmd-sage configuration including AI provider credentials, model preferences, and display settings.
+
+**Usage:**
+
+```bash
+cmd-sage configure
+```
+
+**What you'll configure:**
+
+1. **AI Provider** - Choose from OpenAI, Anthropic, Google, GitHub Models, or GitHub Copilot
+2. **Authentication** - API key (most providers) or OAuth (GitHub Copilot)
+3. **Default Model** - Select from available models for your provider
+4. **Syntax Theme** - Choose your preferred highlighting theme
+5. **Default Action** - Set a default action for suggestions (or always prompt)
+
+## Configuration
+
+**Config file (`~/.config/cmd-sage/cmd-sage.json`):**
+
+```json
+{
+  "provider": "github-models",
+  "model": "gpt-4o",
+  "theme": "github-dark",
+  "default_suggest_action": "copy"
+}
+```
+
+**Fields:**
+
+- `provider` (string, required) - AI provider identifier
+- `model` (string, required) - Model identifier for the provider
+- `theme` (string, optional) - Syntax highlighting theme from [Shiki themes](https://shiki.style/themes)
+- `default_suggest_action` (string, optional) - Default action: `run`, `revise`, `explain`, `copy`, or `cancel`
+
+## Development
+
+```bash
+# Clone the repository
+git clone https://github.com/Armadillidiid/cmd-sage.git
+cd cmd-sage
+
+# Install dependencies
+pnpm install
+
+# Build the project
 pnpm build
 ```
-
-**Testing**
-
-To test the package:
-
-```sh
-pnpm test
-```
-

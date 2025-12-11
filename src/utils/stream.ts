@@ -2,6 +2,12 @@ import { Effect } from "effect";
 import { StreamError } from "@/lib/errors.js";
 
 /**
+ * NOTE: In-place text replacement only works when content fits within the terminal viewport.
+ * When output exceeds terminal height, earlier lines scroll into the unreachable scrollback buffer,
+ * making cursor-based replacement not to work as intended.
+ */
+
+/**
  * Minimum terminal width required for syntax highlighting replacement.
  * Below this width, we skip the cursor manipulation to avoid duplication issues.
  */

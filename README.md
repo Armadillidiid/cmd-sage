@@ -1,6 +1,6 @@
 # ✨ `cmd-sage`
 
-A drop-in replacement for the recently deprecated `gh-copilot`.
+A drop-in replacement for the recently deprecated [`gh-copilot`](https://github.com/github/gh-copilot).
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D23-brightgreen.svg)](https://nodejs.org/)
@@ -18,11 +18,8 @@ PLACEHOLDER - VIDEO DEMO
   - [explain](#explain)
   - [configure](#configure)
 - [Configuration](#configuration)
-- [Development](#development)
 
 ## Installation
-
-> **Prerequisite**: **Node.js** >= 23
 
 ```bash
 npm install -g cmd-sage
@@ -36,8 +33,6 @@ npm install -g cmd-sage
 cmd-sage configure
 ```
 
-Follow the interactive wizard to set up your preferred AI provider, API key, default model, and preferences.
-
 2. **Get command suggestions:**
 
 ```bash
@@ -49,6 +44,12 @@ cmd-sage suggest "find all typescript files modified in the last week"
 ```bash
 cmd-sage explain "find . -name '*.ts' -type f -mtime -7"
 ```
+
+> **💡 Pro Tip:** Create shell alias for easier access:
+>
+> ```bash
+> alias cs='cmd-sage'
+> ```
 
 ## Commands
 
@@ -79,11 +80,8 @@ cmd-sage suggest
 # Direct prompt
 cmd-sage suggest "list all processes using port 3000"
 
-# Git-specific commands
-cmd-sage suggest "create a new branch from main" --target git
-
-# Shell commands (explicit)
-cmd-sage suggest "compress all log files older than 30 days" --target shell
+# Direct prompt with target
+cmd-sage suggest "show diff for the last merge commit" --target git
 ```
 
 **Interactive Actions:**
@@ -133,9 +131,6 @@ cmd-sage explain
 
 # Direct command
 cmd-sage explain "tar -xzf archive.tar.gz -C /destination"
-
-# Complex pipe
-cmd-sage explain "ps aux | grep node | awk '{print \$2}' | xargs kill"
 ```
 
 **Example Output:**
@@ -158,7 +153,7 @@ prompting for confirmation.
 
 ### configure
 
-Set up or update your cmd-sage configuration including AI provider credentials, model preferences, and display settings.
+Set up or update your preferences and authentication.
 
 **Usage:**
 
@@ -169,20 +164,20 @@ cmd-sage configure
 **What you'll configure:**
 
 1. **AI Provider** - Choose from OpenAI, Anthropic, Google, GitHub Models, or GitHub Copilot
-2. **Authentication** - API key (most providers) or OAuth (GitHub Copilot)
+2. **Authentication** - API key or OAuth (GitHub Copilot)
 3. **Default Model** - Select from available models for your provider
 4. **Syntax Theme** - Choose your preferred highlighting theme
-5. **Default Action** - Set a default action for suggestions (or always prompt)
+5. **Default Action** - Set a default action to auto run after suggestions
 
 ## Configuration
 
-**Config file (`~/.config/cmd-sage/cmd-sage.json`):**
+**Default config (`~/.config/cmd-sage/cmd-sage.json`):**
 
 ```json
 {
-  "provider": "github-models",
-  "model": "gpt-4o",
-  "theme": "github-dark",
+  "provider": "github-copilot",
+  "model": "gpt-5-mini",
+  "theme": "github-dark-default",
   "default_suggest_action": "copy"
 }
 ```
@@ -190,20 +185,6 @@ cmd-sage configure
 **Fields:**
 
 - `provider` (string, required) - AI provider identifier
-- `model` (string, required) - Model identifier for the provider
+- `model` (string, required) - Model identifier for the provider from [models.dev](https://models.dev/)
 - `theme` (string, optional) - Syntax highlighting theme from [Shiki themes](https://shiki.style/themes)
-- `default_suggest_action` (string, optional) - Default action: `run`, `revise`, `explain`, `copy`, or `cancel`
-
-## Development
-
-```bash
-# Clone the repository
-git clone https://github.com/Armadillidiid/cmd-sage.git
-cd cmd-sage
-
-# Install dependencies
-pnpm install
-
-# Build the project
-pnpm build
-```
+- `default_suggest_action` (string, optional) - `run`, `revise`, `explain`, `copy`, or `cancel`. Leave unset to always ask.

@@ -1,12 +1,12 @@
 {
-	"name": "cmd-sage",
+	"name": "cmdly",
 	"version": "0.0.0",
 	"type": "module",
 	"packageManager": "pnpm@10.14.0",
 	"license": "MIT",
 	"description": "",
 	"bin": {
-		"cmd-sage": "./dist/bin.cjs"
+		"cmdly": "./dist/bin.cjs"
 	},
 	"exports": {
 		"./bin": {
@@ -18,7 +18,7 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Armadillidiid/cmd-sage"
+		"url": "https://github.com/Armadillidiid/cmdly"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -1,4 +1,4 @@
-# ✨ `cmd-sage`
+# ✨ `cmdly`
 
 A drop-in replacement for the recently deprecated [`gh-copilot`](https://github.com/github/gh-copilot).
 
@@ -22,7 +22,7 @@ PLACEHOLDER - VIDEO DEMO
 ## Installation
 
 ```bash
-npm install -g cmd-sage
+npm install -g cmdly
 ```
 
 ## Quick Start
@@ -30,25 +30,25 @@ npm install -g cmd-sage
 1. **Configure your AI provider:**
 
 ```bash
-cmd-sage configure
+cmdly configure
 ```
 
 2. **Get command suggestions:**
 
 ```bash
-cmd-sage suggest "find all typescript files modified in the last week"
+cmdly suggest "find all typescript files modified in the last week"
 ```
 
 3. **Explain complex commands:**
 
 ```bash
-cmd-sage explain "find . -name '*.ts' -type f -mtime -7"
+cmdly explain "find . -name '*.ts' -type f -mtime -7"
 ```
 
 > **💡 Pro Tip:** Create shell alias for easier access:
 >
 > ```bash
-> alias cs='cmd-sage'
+> alias cm='cmdly' # or cly
 > ```
 
 ## Commands
@@ -60,7 +60,7 @@ Generate command suggestions from natural language descriptions.
 **Usage:**
 
 ```bash
-cmd-sage suggest [prompt] [options]
+cmdly suggest [prompt] [options]
 ```
 
 **Arguments:**
@@ -75,13 +75,13 @@ cmd-sage suggest [prompt] [options]
 
 ```bash
 # Interactive mode
-cmd-sage suggest
+cmdly suggest
 
 # Direct prompt
-cmd-sage suggest "list all processes using port 3000"
+cmdly suggest "list all processes using port 3000"
 
 # Direct prompt with target
-cmd-sage suggest "show diff for the last merge commit" --target git
+cmdly suggest "show diff for the last merge commit" --target git
 ```
 
 **Interactive Actions:**
@@ -97,7 +97,7 @@ After receiving a suggestion, you can:
 **Example Session:**
 
 ```bash
-$ cmd-sage suggest "find large files over 100MB"
+$ cmdly suggest "find large files over 100MB"
 
 find . -type f -size +100M
 
@@ -116,7 +116,7 @@ Get detailed explanations of shell commands with component breakdowns.
 **Usage:**
 
 ```bash
-cmd-sage explain [command]
+cmdly explain [command]
 ```
 
 **Arguments:**
@@ -127,16 +127,16 @@ cmd-sage explain [command]
 
 ```bash
 # Interactive mode
-cmd-sage explain
+cmdly explain
 
 # Direct command
-cmd-sage explain "tar -xzf archive.tar.gz -C /destination"
+cmdly explain "tar -xzf archive.tar.gz -C /destination"
 ```
 
 **Example Output:**
 
 ```bash
-$ cmd-sage explain "rm -rf /tmp/cache"
+$ cmdly explain "rm -rf /tmp/cache"
 
 ## Summary
 
@@ -158,7 +158,7 @@ Set up or update your preferences and authentication.
 **Usage:**
 
 ```bash
-cmd-sage configure
+cmdly configure
 ```
 
 **What you'll configure:**
@@ -171,7 +171,7 @@ cmd-sage configure
 
 ## Configuration
 
-**Default config (`~/.config/cmd-sage/cmd-sage.json`):**
+**Default config (`~/.config/cmdly/cmdly.json`):**
 
 ```json
 {

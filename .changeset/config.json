@@ -3,7 +3,7 @@
 	"changelog": [
 		"@changesets/changelog-github",
 		{
-			"repo": "Armadillidiid/cmd-sage"
+			"repo": "Armadillidiid/cmdly"
 		}
 	],
 	"commit": false,

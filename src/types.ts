@@ -17,3 +17,7 @@ export type ModelInfo = typeof modelInfoSchema.Type;
 export type ProviderInfo = typeof providerInfoSchema.Type;
 export type ModelsDevResponse = typeof modelsDevResponseSchema.Type;
 export type ProviderId = (typeof SUPPORTED_PROVIDER_IDS)[number];
+
+export type NonOptional<T extends Record<string, unknown>> = {
+	[K in keyof T]-?: T[K]
+};

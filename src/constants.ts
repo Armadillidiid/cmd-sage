@@ -1,4 +1,4 @@
-import type { Config } from "./types.js";
+import type { Config, NonOptional } from "./types.js";
 
 declare const __VERSION__: string;
 declare const __NAME__: string;
@@ -13,9 +13,11 @@ const CONFIG_FILENAME = `${NAME}.json`;
 const STATE_DIRECTORY = `~/.local/share/${NAME}`;
 const CREDENTIALS_FILENAME = "credentials.json";
 
-const DEFAULT_CONFIG: Config = {
-	model: "gpt-4o",
+const DEFAULT_CONFIG: NonOptional<Config> = {
+	model: "gpt-5-mini",
 	provider: "github-models",
+	theme: "github-dark-default",
+	default_suggest_action: undefined,
 };
 
 export {

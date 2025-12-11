@@ -15,7 +15,7 @@ import {
 	writeJsonFile,
 } from "@/utils/files.js";
 
-const onStartLoadConfig = Effect.gen(function* () {
+const loadConfig = Effect.gen(function* () {
 	const path = yield* Path.Path;
 	const configPath = path.join(CONFIG_DIRECTORY, CONFIG_FILENAME);
 
@@ -29,7 +29,14 @@ const onStartLoadConfig = Effect.gen(function* () {
 		),
 	);
 
-	return config ?? DEFAULT_CONFIG;
+	// Merge with defaults to ensure all fields are present
+	return {
+		model: config?.model ?? DEFAULT_CONFIG.model,
+		provider: config?.provider ?? DEFAULT_CONFIG.provider,
+		default_suggest_action:
+			config?.default_suggest_action ?? DEFAULT_CONFIG.default_suggest_action,
+		theme: config?.theme ?? DEFAULT_CONFIG.theme,
+	};
 });
 
 /**
@@ -66,7 +73,7 @@ const saveConfig = (config: Config) =>
 	});
 
 const configService = Effect.gen(function* () {
-	const config = yield* onStartLoadConfig;
+	const config = yield* loadConfig;
 	return {
 		config: () => Effect.succeed(config),
 		saveConfig: (newConfig: Config) => saveConfig(newConfig),

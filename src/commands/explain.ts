@@ -41,15 +41,13 @@ const explainCommand = Command.make(
 			});
 
 			const ai = yield* AiService;
-			yield* Console.log(""); // Print newline before streaming
+			yield* Console.log("");
 
-			// Get the stream from AI service
 			const stream = yield* ai.explain(userCommand);
 
-			// Display the stream with highlighting
 			yield* displayStream(stream, highlightMarkdown);
 
-			yield* Console.log(""); // Print newline after streaming
+			yield* Console.log("");
 		}).pipe(Effect.provide(programLayer)),
 );
 

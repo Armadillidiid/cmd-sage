@@ -2,21 +2,13 @@ import { Command, Prompt } from "@effect/cli";
 import { NodeFileSystem, NodePath } from "@effect/platform-node";
 import { Console, Effect, Layer, Redacted } from "effect";
 import { type BundledTheme, bundledThemesInfo } from "shiki";
-import {
-	CONFIG_DIRECTORY,
-	CONFIG_FILENAME,
-	CREDENTIALS_FILENAME,
-	STATE_DIRECTORY,
-	SUGGEST_ACTION_CHOICES,
-	SUPPORTED_PROVIDER_IDS,
-} from "@/constants.js";
+import { SUGGEST_ACTION_CHOICES, SUPPORTED_PROVIDER_IDS } from "@/constants.js";
 import { ConfigService } from "@/services/config.js";
 import { CredentialsService } from "@/services/credentials.js";
 import { GitHubOAuthService } from "@/services/github-oauth.js";
 import type { Credentials, CredentialValue } from "@/types.js";
 import { markCurrentChoice, stripCurrentMarker } from "@/utils/config.js";
 import { fetchAndCacheModels, fetchProviderModels } from "@/utils/models.js";
-import { expandHome } from "@/utils/files.js";
 
 const layers = Layer.mergeAll(
 	GitHubOAuthService.Default,

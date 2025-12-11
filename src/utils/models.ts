@@ -33,7 +33,6 @@ const isCacheStale = (filePath: string) =>
 		const fs = yield* FileSystem.FileSystem;
 		const info = yield* fs.stat(filePath);
 
-		// mtime is an Option<Date>, extract it or default to epoch
 		const mtimeMs = Option.getOrElse(info.mtime, () => new Date(0)).getTime();
 		const age = Date.now() - mtimeMs;
 		return age > MODELS_CACHE_MAX_AGE_MS;
@@ -53,7 +52,6 @@ export const fetchAndCacheModels = (force = false) =>
 		const cachePath = yield* getModelsCachePath();
 		const exists = yield* fileExists(cachePath);
 
-		// Check if we can use existing cache
 		if (exists && !force) {
 			const stale = yield* isCacheStale(cachePath);
 			if (!stale) {
@@ -70,7 +68,6 @@ export const fetchAndCacheModels = (force = false) =>
 			}
 		}
 
-		// Fetch from API
 		const response = yield* Effect.tryPromise({
 			try: () =>
 				fetch("https://models.dev/api.json").then((r) => {
@@ -89,7 +86,6 @@ export const fetchAndCacheModels = (force = false) =>
 				}),
 		});
 
-		// Decode and validate the response using the schema
 		const data = yield* Schema.decodeUnknown(modelsDevResponseSchema)(
 			response,
 		).pipe(
@@ -102,11 +98,9 @@ export const fetchAndCacheModels = (force = false) =>
 			),
 		);
 
-		// Ensure state directory exists
 		const stateDir = yield* expandHome(STATE_DIRECTORY);
 		yield* ensureDirectory(stateDir);
 
-		// Write to cache
 		yield* writeJsonFile(cachePath, data);
 
 		return data;

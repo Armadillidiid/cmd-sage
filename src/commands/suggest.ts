@@ -57,7 +57,6 @@ const suggestCommand = Command.make(
 				initialMessages,
 			);
 
-			// Get default action from config
 			const configService = yield* ConfigService;
 			const config = yield* configService.config();
 			const defaultAction = config?.default_suggest_action;
@@ -138,16 +137,12 @@ const getSuggestAndLog = (
 	messages: ModelMessage[],
 ) =>
 	Effect.gen(function* () {
-		// Print newline before streaming starts
 		yield* Console.log("");
 
-		// Get the stream from AI service
 		const stream = yield* ai.suggest(target, messages);
 
-		// Display the stream with highlighting
 		const command = yield* displayStream(stream, highlightShell);
 
-		// Print newline after streaming ends
 		yield* Console.log("");
 		return command;
 	});

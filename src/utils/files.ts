@@ -155,9 +155,7 @@ export const readJsonConfig = <A, I, R>(
 			return undefined;
 		}
 
-		// Ensure strict permissions (0o600)
 		yield* ensureFilePermissions(expandedPath, 0o600);
 
-		// Read and parse config
 		return yield* readJsonFile(expandedPath, schema);
 	});

@@ -136,21 +136,18 @@ const pollForAccessToken = (
 				}),
 		});
 
-		// Try to decode as error response first
 		const errorResult =
 			Schema.decodeUnknownOption(ErrorResponseSchema)(response);
 		if (errorResult._tag === "Some") {
 			const error = errorResult.value;
 
 			if (error.error === "authorization_pending") {
-				// User hasn't authorized yet, retry
 				return yield* Effect.fail(
 					new GitHubOAuthError({ message: "authorization_pending" }),
 				);
 			}
 
 			if (error.error === "slow_down") {
-				// Hit rate limit, need to slow down
 				return yield* Effect.fail(
 					new GitHubOAuthError({ message: "slow_down" }),
 				);
@@ -173,7 +170,6 @@ const pollForAccessToken = (
 				);
 			}
 
-			// Other errors
 			return yield* Effect.fail(
 				new GitHubOAuthError({
 					message:
@@ -182,7 +178,6 @@ const pollForAccessToken = (
 			);
 		}
 
-		// Try to decode as success response
 		const tokenResult = yield* Schema.decodeUnknown(AccessTokenResponseSchema)(
 			response,
 		).pipe(
@@ -264,7 +259,7 @@ const refreshCopilotToken = (refreshToken: string) =>
 
 		return {
 			token: copilotTokenData.token,
-			tokenExpiry: copilotTokenData.expires_at * 1000, // Convert to milliseconds
+			tokenExpiry: copilotTokenData.expires_at * 1000,
 		};
 	});
 
@@ -277,11 +272,9 @@ const authenticateWithGitHub = Effect.gen(function* () {
 		"\n🔐 GitHub Copilot requires device-based authentication.\n",
 	);
 
-	// Step 1: Get device code
 	yield* Console.log("Requesting device code from GitHub...\n");
 	const deviceCodeResponse: DeviceCodeResponse = yield* initiateDeviceFlow;
 
-	// Step 2: Display instructions to user
 	yield* Console.log("Please follow these steps to authenticate:\n");
 	yield* Console.log(
 		`1. Visit: ${deviceCodeResponse.verification_uri || VERIFICATION_URL}`,
@@ -289,7 +282,6 @@ const authenticateWithGitHub = Effect.gen(function* () {
 	yield* Console.log(`2. Enter this code: ${deviceCodeResponse.user_code}\n`);
 	yield* Console.log("Waiting for authorization...\n");
 
-	// Step 3: Poll for GitHub OAuth access token (this becomes our refresh token)
 	const githubRefreshToken = yield* pollForAccessToken(
 		deviceCodeResponse.device_code,
 		deviceCodeResponse.interval,
@@ -304,7 +296,6 @@ const authenticateWithGitHub = Effect.gen(function* () {
 
 	yield* Console.log("✅ Authorization successful!\n");
 
-	// Step 4: Exchange GitHub OAuth token for Copilot token
 	const copilotTokenData = yield* getCopilotToken(githubRefreshToken);
 
 	yield* Console.log("✅ Copilot token retrieved!\n");
@@ -312,7 +303,7 @@ const authenticateWithGitHub = Effect.gen(function* () {
 	return {
 		refreshToken: githubRefreshToken,
 		token: copilotTokenData.token,
-		tokenExpiry: copilotTokenData.expires_at * 1000, // Convert to milliseconds
+		tokenExpiry: copilotTokenData.expires_at * 1000,
 	};
 });
 

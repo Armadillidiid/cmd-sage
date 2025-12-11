@@ -7,15 +7,10 @@ import { StreamError } from "@/lib/errors.js";
  * making cursor-based replacement not to work as intended.
  */
 
-/**
- * Minimum terminal width required for syntax highlighting replacement.
- * Below this width, we skip the cursor manipulation to avoid duplication issues.
- */
 const MIN_TERMINAL_WIDTH = 80;
 
 /**
- * Calculate the number of terminal lines a text string will occupy,
- * accounting for line wrapping based on terminal width.
+ * Calculate the number of terminal lines a text string will occupy
  */
 const calculateRenderedLines = (text: string): number => {
 	const termWidth = globalThis.process.stdout.columns || 80;
@@ -50,7 +45,6 @@ export const displayStream = <R>(
 				let accumulated = "";
 				for await (const chunk of stream.textStream) {
 					accumulated += chunk;
-					// Display chunk immediately for real-time feedback
 					globalThis.process.stdout.write(chunk);
 				}
 				return accumulated;
@@ -64,8 +58,6 @@ export const displayStream = <R>(
 
 		const highlighted = yield* highlighter(streamData);
 
-		// Only replace text with highlighted version if stdout is a TTY and terminal is wide enough
-		// In non-TTY contexts (pipes, redirects) or narrow terminals, just append the highlighted version
 		const termWidth = globalThis.process.stdout.columns || 80;
 		const canReplace =
 			globalThis.process.stdout.isTTY && termWidth >= MIN_TERMINAL_WIDTH;
@@ -88,8 +80,6 @@ export const displayStream = <R>(
 
 			globalThis.process.stdout.write(highlighted);
 		} else {
-			// If not a TTY or terminal is too narrow, just output the highlighted text after the plain text
-			// This happens when output is piped, redirected, or terminal width is below minimum
 			globalThis.process.stdout.write("\n");
 			globalThis.process.stdout.write(highlighted);
 		}

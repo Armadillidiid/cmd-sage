@@ -37,7 +37,7 @@
 		"changeset-publish": "pnpm build && pnpm vitest && changeset publish",
 		"format": "biome format --write",
 		"lint": "biome lint --write",
-		"check": "biome check --write"
+		"check": "biome check --write --unsafe"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.3.8",

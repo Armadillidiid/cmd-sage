@@ -38,6 +38,12 @@
 		"plugins": [{ "name": "@effect/language-service" }],
 		"paths": {
 			"@/*": ["./src/*"]
-		}
+		},
+
+		// Native Node support
+		"allowImportingTsExtensions": true,
+		"rewriteRelativeImportExtensions": true,
+		"erasableSyntaxOnly": true,
+		"verbatimModuleSyntax": true
 	}
 }

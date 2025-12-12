@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import { NodeContext, NodeRuntime, NodeTerminal } from "@effect/platform-node";
 import { Cause, Console, Effect, Exit, Layer } from "effect";
 import { CliService } from "./cli.js";

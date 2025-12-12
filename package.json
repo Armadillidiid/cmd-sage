@@ -6,11 +6,12 @@
 	"license": "MIT",
 	"description": "",
 	"bin": {
-		"cmdly": "./dist/bin.cjs"
+		"cmdly": "./dist/index.js"
 	},
 	"exports": {
 		"./bin": {
-			"require": "./dist/bin.cjs"
+			"require": "./dist/index.js",
+			"import": "./dist/index.js"
 		}
 	},
 	"files": [
@@ -27,10 +28,11 @@
 		"node": ">=23"
 	},
 	"scripts": {
-		"build": "node scripts/build.ts",
-		"build:watch": "node scripts/build.ts --watch",
+		"dev": "node --import=tsx src/bin.ts --watch",
+		"build": "ncc build src/bin.ts -o dist -m",
+		"postbuild": "node scripts/inject-constant.js",
 		"prepare": "effect-language-service patch",
-		"clean": "rimraf dist/*",
+		"clean": "rm -rf dist/*",
 		"typecheck": "tsc -b tsconfig.json",
 		"test": "vitest run",
 		"changeset-version": "changeset version",
@@ -50,8 +52,8 @@
 		"@effect/vitest": "^0.27.0",
 		"@types/copy-paste": "^2.1.0",
 		"@types/node": "^24.10.1",
+		"@vercel/ncc": "^0.38.4",
 		"effect": "^3.19.9",
-		"pkgroll": "^2.21.4",
 		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",
 		"vitest": "^4.0.15"

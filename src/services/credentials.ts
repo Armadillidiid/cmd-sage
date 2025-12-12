@@ -8,7 +8,6 @@ import {
 	ensureDirectory,
 	expandHome,
 	readJsonConfig,
-	setFilePermissions,
 	writeJsonFile,
 } from "@/utils/files.js";
 import { GitHubOAuthService } from "./github-oauth.js";
@@ -46,23 +45,12 @@ const saveCredentials = (credentials: CredentialsRecord) =>
 			),
 		);
 
-		// Write credentials
-		yield* writeJsonFile(credentialsPath, credentials).pipe(
+		// Write credentials with strict permissions (0600)
+		yield* writeJsonFile(credentialsPath, credentials, 0o600).pipe(
 			Effect.mapError(
 				(error) =>
 					new CredentialsError({
 						message: "Failed to write credentials file",
-						cause: error,
-					}),
-			),
-		);
-
-		// Ensure strict permissions (0600)
-		yield* setFilePermissions(credentialsPath, 0o600).pipe(
-			Effect.mapError(
-				(error) =>
-					new CredentialsError({
-						message: "Failed to set credentials file permissions",
 						cause: error,
 					}),
 			),

@@ -83,16 +83,16 @@ export const readJsonFile = <A, I, R>(
 export const writeJsonFile = (
 	filePath: string,
 	data: unknown,
+	mode = 0o644,
 ): Effect.Effect<void, PlatformError, FileSystem.FileSystem> =>
 	Effect.gen(function* () {
 		const fs = yield* FileSystem.FileSystem;
 		yield* fs.writeFileString(filePath, JSON.stringify(data, null, 2));
+		yield* setFilePermissions(filePath, mode);
 	});
 
 /**
  * Set file permissions (Unix only)
- * @param filePath Path to the file
- * @param mode Numeric mode (e.g., 0o600 for read/write owner only)
  */
 export const setFilePermissions = (
 	filePath: string,
@@ -133,9 +133,6 @@ export const ensureFilePermissions = (
 	Effect.gen(function* () {
 		const currentMode = yield* getFilePermissions(filePath);
 		if (currentMode !== undefined && currentMode !== expectedMode) {
-			yield* Effect.log(
-				`Warning: File has insecure permissions (${currentMode.toString(8)}), setting to ${expectedMode.toString(8)}...`,
-			);
 			yield* setFilePermissions(filePath, expectedMode);
 		}
 	});

@@ -15,7 +15,7 @@ const CREDENTIALS_FILENAME = "credentials.json";
 
 const DEFAULT_CONFIG: NonOptional<Config> = {
 	model: "gpt-5-mini",
-	provider: "github-models",
+	provider: "github-copilot",
 	theme: "github-dark-default",
 	default_suggest_action: undefined,
 };
